@@ -18,10 +18,5 @@ def index():
         ' FROM device p'
         ' ORDER BY device_name DESC'
     ).fetchall()
-    services = db.execute(
-        'SELECT p.id, service_name, service_description'
-        ' FROM service p'
-        ' ORDER BY service_name DESC'
-    ).fetchall()
 
-    return render_template('index.html', devices=devices,services=services)
+    return render_template('index.html', devices=devices)

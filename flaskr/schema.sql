@@ -15,9 +15,4 @@ CREATE TABLE device(
     device_description TEXT
 );
 
-CREATE TABLE service(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    service_name TEXT UNIQUE NOT NULL,
-    service_description TEXT
-);
 

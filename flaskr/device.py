@@ -45,6 +45,6 @@ def create():
                 (tag, name, description)
             )
             db.commit()
-            return redirect(url_for('device.index'))
+            return redirect(url_for('index.index'))
 
     return render_template('device/create.html')
