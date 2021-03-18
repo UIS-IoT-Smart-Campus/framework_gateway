@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message SingleFloatValueMessage {
+    int32 device_id = 1;
+    float value = 2;
+}
+
+message Response {
+    bool response = 1;
+}
+
+service SFVMessage {
+    rpc SFMessage(SingleFloatValueMessage) returns (Response) {}
+}
