@@ -22,16 +22,18 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-
-    #A simple page that say hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
     
+    #Registrar gestion de la base de datos en la app
     from . import db
     db.init_app(app)
 
+    #Registrar espacio de trabajo para login y registro
     from . import auth
     app.register_blueprint(auth.bp)
+
+    #Registrar espacio de tabajo para index/devices
+    from . import device
+    app.register_blueprint(device.bp)
+    app.add_url_rule('/', endpoint='index')
     
     return app

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}New Device{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="tag">Tag</label>
+    <input name="tag" id="tag" value="{{ request.form['tag'] }}" required>
+    <label for="name">Device Name</label>
+    <input name="name" id="name" value="{{ request.form['name'] }}" required>
+    <label for="description">Device Description</label>
+    <textarea name="description" id="description">{{ request.form['description'] }}</textarea>
+    <input type="submit" value="Save">
+  </form>
+{% endblock %}
