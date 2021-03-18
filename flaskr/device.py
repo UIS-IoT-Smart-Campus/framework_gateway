@@ -6,22 +6,7 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.db import get_db
 
-bp = Blueprint('device', __name__)
-
-
-
-@bp.route('/')
-def index():
-    """ Index de la app"""
-    db = get_db()
-    devices = db.execute(
-        'SELECT p.id, tagGlobal, device_name, device_description'
-        ' FROM device p'
-        ' ORDER BY device_name DESC'
-    ).fetchall()
-    return render_template('device/index.html', devices=devices)
-
-
+bp = Blueprint('device', __name__, url_prefix='/device')
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required

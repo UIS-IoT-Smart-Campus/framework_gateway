@@ -31,9 +31,19 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
 
-    #Registrar espacio de tabajo para index/devices
+    #Registrar espacio de tabajo para el index
+    from . import index
+    app.register_blueprint(index.bp)
+    app.add_url_rule('/', endpoint='index')
+
+    #Registrar espacio de tabajo para devices
     from . import device
     app.register_blueprint(device.bp)
-    app.add_url_rule('/', endpoint='index')
+    app.add_url_rule('/device', endpoint='index')
+
+    #Registrar espacio de tabajo para servicios
+    from . import service
+    app.register_blueprint(service.bp)
+    app.add_url_rule('/service', endpoint='index')
     
     return app
