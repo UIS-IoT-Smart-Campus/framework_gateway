@@ -1,10 +1,13 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
+
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
+
+import os
 
 bp = Blueprint('device', __name__, url_prefix='/device')
 
@@ -21,7 +24,6 @@ def create():
         if not tag:
             error = 'Tag is required.'
         else:
-            print(tag)
             db = get_db()
             tag_repeated = db.execute(
                 'SELECT tagGlobal'
@@ -38,13 +40,27 @@ def create():
         if error is not None:
             flash(error)
         else:
-            db = get_db()
-            db.execute(
-                'INSERT INTO device (tagGlobal, device_name, device_description)'
-                ' VALUES (?, ?, ?)',
-                (tag, name, description)
-            )
-            db.commit()
-            return redirect(url_for('index.index'))
+            
+            try:
+                directory = "flaskr/device_data/"+tag
+                print("entro")
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+                    print("entro")
+                db = get_db()
+                db.execute(
+                    'INSERT INTO device (tagGlobal, device_name, device_description)'
+                    ' VALUES (?, ?, ?)',
+                    (tag, name, description)
+                )
+                db.commit()
+
+                return redirect(url_for('index.index'))
+
+            except OSError as e:
+                print(e)
+                flash("Creation of the directory %s failed" % tag)
+            except Exception:
+                flash("DB Creation Failed")
 
     return render_template('device/create.html')

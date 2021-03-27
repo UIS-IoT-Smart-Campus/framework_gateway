@@ -5,10 +5,18 @@ from flask import Flask
 def create_app(test_config=None):
     #Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+
+    #Set app configuration
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+        SQLALCHEMY_DATABASE_URI='sqlite:////tmp/test.db',
+        FLASK_DEBUG=False,
+        MQTT_BROKER_URL='localhost',
+        MQTT_BROKER_PORT=1883,
+        MQTT_KEEPALIVE=60,
     )
+
 
     if test_config is None:
         #Load the instance config, if it exists, when not testing
@@ -22,6 +30,10 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
+    
+    #MQTT registration
+    from . import mqtt
+    mqtt.init_app(app)
     
     #Registrar gestion de la base de datos en la app
     from . import db
@@ -40,5 +52,5 @@ def create_app(test_config=None):
     from . import device
     app.register_blueprint(device.bp)
     app.add_url_rule('/device', endpoint='index')
-    
+        
     return app

@@ -5,6 +5,7 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
+from flaskr.models.models import DeviceModel
 
 bp = Blueprint('index', __name__)
 
@@ -12,11 +13,5 @@ bp = Blueprint('index', __name__)
 @bp.route('/')
 def index():
     """ Index de la app"""
-    db = get_db()
-    devices = db.execute(
-        'SELECT p.id, tagGlobal, device_name, device_description'
-        ' FROM device p'
-        ' ORDER BY device_name DESC'
-    ).fetchall()
-
+    devices = DeviceModel.get_all()
     return render_template('index.html', devices=devices)
