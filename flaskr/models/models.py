@@ -1,11 +1,11 @@
 #import sqlite3
-from flask import current_app
 from flaskr.db import get_db
-from flask import current_app as app
 from flaskr.popyo.device import Device
+
 
 class DeviceModel():
 
+    @staticmethod
     def get_all():
         db = get_db()
         devices = db.execute(
@@ -15,6 +15,7 @@ class DeviceModel():
             ).fetchall()
         return devices
     
+    @staticmethod
     def get_device_tag(tag):
         db = get_db()
         device_cursor = db.execute(

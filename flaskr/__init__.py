@@ -1,6 +1,12 @@
 import os
 
 from flask import Flask
+from flask_mqtt import Mqtt
+from flaskr.persistence import Persistence
+from flaskr.models.models import DeviceModel
+import json
+
+
 
 def create_app(test_config=None):
     #Create and configure the app
@@ -32,8 +38,34 @@ def create_app(test_config=None):
         pass
     
     #MQTT registration
-    from . import mqtt
-    mqtt.init_app(app)
+    #from . import mqtt
+    #mqtt.init_app(app)
+    mqtt = Mqtt(app)
+    pst = Persistence()
+
+    def MQTT_Converter(message):
+        return json.loads(message)
+
+
+    #When the client subscribe to broker
+    @mqtt.on_connect()
+    def handle_connect(client, userdata, flags, rc):
+        mqtt.unsubscribe_all()
+        mqtt.subscribe('device/data')
+
+    #If a message is sent by broker
+    @mqtt.on_message()
+    def handle_mqtt_message(client, userdata, message):
+        msg = MQTT_Converter(message.payload.decode("utf-8"))
+        if msg["device_tag"]:
+            with app.app_context():
+                device = DeviceModel.get_device_tag(msg["device_tag"])
+            if device.id is not None:
+                pst.insert_message(msg,device)
+            else:
+                print("Error not device")
+        else:
+            print("Error: Not tag device register")
     
     #Registrar gestion de la base de datos en la app
     from . import db
@@ -54,3 +86,5 @@ def create_app(test_config=None):
     app.add_url_rule('/device', endpoint='index')
         
     return app
+
+

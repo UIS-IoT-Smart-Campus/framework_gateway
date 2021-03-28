@@ -1,15 +1,9 @@
 from tinydb import TinyDB, Query
 
-from tinydb import TinyDB, Query
-from .models.models import DeviceModel
-
 import json
 
 
 class Persistence():
-
-    def MQTT_Converter(self,message):
-        return json.loads(message)
 
     """
     Msg is a json format
@@ -17,13 +11,10 @@ class Persistence():
     key: Is the key of the value
     value: Is the value for store
     """
-    def insert_message(self,message):
-        msg = self.MQTT_Converter(message)
+    def insert_message(self,msg,device):        
         if msg["device_tag"] and msg["key"] and msg["value"] and msg["table"]:
-            device_tag = msg["device_tag"]
-            device = DeviceModel().get_device_tag(tag=device_tag)
-            if device.id is not None:
-                db = TinyDB('flaskr/device_data/'+device.tag+"/"+device_tag+".json")
-                db.table(msg["table"])
-                db.insert({msg["key"]:msg["value"]})
+            device_tag = str(msg["device_tag"])
+            db = TinyDB('flaskr/device_data/'+device.tag+"/"+device_tag+".json")
+            table = db.table(str(msg["table"]))
+            table.insert({str(msg["key"]):str(msg["value"]),"time":str(msg["time"])})
 
