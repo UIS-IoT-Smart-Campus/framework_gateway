@@ -63,15 +63,16 @@ def publish(client):
         current_time = now.strftime("%d-%m-%Y %H:%M:%S")
 
         msg = {"device_tag":device_tag,"table":table,"key":key,"value":value,"time":current_time}
-        msg_json = json.dumps(msg) 
-        print(msg_json)
+        msg_json = json.dumps(msg)
         result = client.publish(topic, msg_json)
         # result: [0, 1]
         status = result[0]
         if status == 0:
-            print(f"Send `{msg}` to topic `{topic}`")
+            pass
+            #print(f"Send `{msg}` to topic `{topic}`")
         else:
-            print(f"Failed to send message to topic {topic}")
+            pass
+            #print(f"Failed to send message to topic {topic}")
         msg_count += 1
         time.sleep(delay_time)
 

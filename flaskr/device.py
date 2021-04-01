@@ -43,10 +43,8 @@ def create():
             
             try:
                 directory = "flaskr/device_data/"+tag
-                print("entro")
                 if not os.path.exists(directory):
                     os.makedirs(directory)
-                    print("entro")
                 db = get_db()
                 db.execute(
                     'INSERT INTO device (tagGlobal, device_name, device_description)'
@@ -58,7 +56,6 @@ def create():
                 return redirect(url_for('index.index'))
 
             except OSError as e:
-                print(e)
                 flash("Creation of the directory %s failed" % tag)
             except Exception:
                 flash("DB Creation Failed")
