@@ -16,7 +16,6 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
-        SQLALCHEMY_DATABASE_URI='sqlite:////tmp/test.db',
         FLASK_DEBUG=False,
         MQTT_BROKER_URL='localhost',
         MQTT_BROKER_PORT=1883,
@@ -84,6 +83,11 @@ def create_app(test_config=None):
     from . import device
     app.register_blueprint(device.bp)
     app.add_url_rule('/device', endpoint='index')
+
+    """
+    if __name__=="__main__":
+        serve(app, host='0.0.0.0',port=5000, url_scheme='https')
+    """
         
     return app
 

@@ -27,9 +27,9 @@ def handle_mqtt_message(client, userdata, message):
         if device.id is not None:
             pst.insert_message(msg,device)
         else:
-            print("Error not device")
+            pass
     else:
-        print("Error: Not tag device register")
+        pass
 
 
 def init_app(app):
