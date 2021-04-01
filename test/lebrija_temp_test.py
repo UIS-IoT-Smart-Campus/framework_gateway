@@ -22,7 +22,7 @@ device_tag = "A001"
 key = "temp"
 value = 0
 table = "temp_lebrija"
-delay_time = 15
+delay_time = 10
 
 # username = 'emqx'
 # password = 'public'
