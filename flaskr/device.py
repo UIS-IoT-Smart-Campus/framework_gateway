@@ -7,9 +7,11 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
+from flask import request
 
 from flask import jsonify
 import json
+from tinydb import TinyDB, Query
 
 import os
 
@@ -67,13 +69,18 @@ def create():
     return render_template('device/create.html')
 
 
-@bp.route('/temp_lebrija', methods=('GET', 'POST'))
+@bp.route('/get_data', methods=('GET', 'POST'))
 #@login_required
 def temp_lebrija():
-    f = open('flaskr/device_data/A001/A001.json',)
-    data = json.load(f)
-    f.close()
-    
+    device_tag = request.args.get('device_tag',None)
+    table = request.args.get('device_table',None)
+    if device_tag and table:
+        db = TinyDB('flaskr/device_data/'+str(device_tag)+'/'+str(device_tag)+'.json')
+        #data = json.load(db.all())
+        table = db.table(str(table))
+        data = table.all()
+    else:
+        data = {}
     return jsonify(data)
 
 
