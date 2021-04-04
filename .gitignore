@@ -12,4 +12,6 @@ htmlcov/
 dist/
 build/
 *.egg-info/
-.sh
+*.sh
+*.out
+*.json
