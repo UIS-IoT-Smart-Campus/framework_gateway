@@ -2,10 +2,14 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
 
+
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
+
+from flask import jsonify
+import json
 
 import os
 
@@ -61,3 +65,15 @@ def create():
                 flash("DB Creation Failed")
 
     return render_template('device/create.html')
+
+
+@bp.route('/temp_lebrija', methods=('GET', 'POST'))
+#@login_required
+def temp_lebrija():
+    f = open('flaskr/device_data/A001/A001.json',)
+    data = json.load(f)
+    f.close()
+    
+    return jsonify(data)
+
+

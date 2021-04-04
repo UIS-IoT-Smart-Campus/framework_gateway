@@ -1,5 +1,30 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+  <form class="login-form" method="post">
+    <p class="login-text">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-lock fa-stack-1x"></i>
+      </span>
+    </p>
+    <input class="login-username" autofocus="true" required="true" placeholder="Username" name="username" id="username" required>
+    <input type="password" class="login-password" required="true" placeholder="Password" name="password" id="password">
+    <input type="submit" name="Login" value="Login" class="login-submit" />
+  </form>
+  <a href="{{ url_for('auth.register') }}" class="login-forgot-pass">Register</a>
+  <div class="underlay-photo"></div>
+  <div class="underlay-black"></div> 
+</body>
+</html>
 
+
+
+<!--
 {% block header %}
   <h1>{% block title %}Log In{% endblock %}</h1>
 {% endblock %}
@@ -13,3 +38,4 @@
     <input type="submit" value="Log In">
   </form>
 {% endblock %}
+-->

@@ -1,11 +1,12 @@
+#!/home/pi/Documents/framework/venv/bin/python
 import random
 import time
 import requests
 import json
 from datetime import datetime
 import pytz
-
 from paho.mqtt import client as mqtt_client
+
 
 """
 Parameters of publish code from python
@@ -16,13 +17,13 @@ Source: https://www.emqx.io/blog/how-to-use-mqtt-in-python
 broker = 'localhost'
 port = 1883
 topic = "device/data"
-client_id = f'python-mqtt-{random.randint(0, 1000)}'
+client_id = 'python-mqtt-A001'
 #Message Parameter
 device_tag = "A001"
-key = "temp"
-value = 0
+keys = ["temp","feels_like","pressure","humidity"]
+values = [0,0,0,0]
 table = "temp_lebrija"
-delay_time = 10
+delay_time = 3600
 
 # username = 'emqx'
 # password = 'public'
@@ -52,17 +53,24 @@ def publish(client):
         resp = requests.get('http://api.openweathermap.org/data/2.5/weather?q=Lebrija,co&APPID=d205eb86c19c0897cf10319745ce283d&units=metric')
         if resp.status_code != 200:
             # This means something went wrong.
-            print("Error")
-            value = 0
+            values = [0,0,0,0]
+            pass
         else:
             temp= resp.json()["main"]["temp"]
-            value = temp
+            feels_like = resp.json()["main"]["feels_like"]
+            pressure = resp.json()["main"]["pressure"]
+            humidity = resp.json()["main"]["humidity"]
+            values = []
+            values.append(temp)
+            values.append(feels_like)
+            values.append(pressure)
+            values.append(humidity)
         
         tz_Col = pytz.timezone('America/Bogota')
         now = datetime.now(tz_Col)
         current_time = now.strftime("%d-%m-%Y %H:%M:%S")
 
-        msg = {"device_tag":device_tag,"table":table,"key":key,"value":value,"time":current_time}
+        msg = {"device_tag":device_tag,"table":table,"keys":keys,"values":values,"time":current_time}
         msg_json = json.dumps(msg)
         result = client.publish(topic, msg_json)
         # result: [0, 1]
@@ -81,7 +89,6 @@ def run():
     client = connect_mqtt()
     client.loop_start()
     publish(client)
-
 
 if __name__ == '__main__':
     run()
