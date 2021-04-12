@@ -92,6 +92,11 @@ def create_app(test_config=None):
     app.register_blueprint(device.bp)
     app.add_url_rule('/device', endpoint='index')
 
+    #Registrar espacio de tabajo para devices
+    from . import gateway
+    app.register_blueprint(gateway.bp)
+    app.add_url_rule('/gateway', endpoint='index')
+
     """
     if __name__=="__main__":
         serve(app, host='0.0.0.0',port=5000, url_scheme='https')
