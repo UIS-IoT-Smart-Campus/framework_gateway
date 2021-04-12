@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Device{% endblock %}
+
+{% block menu %}
+<ul class="nav nav-pills flex-column mb-auto">
+  <li class="nav-item">
+    <a href="{{ url_for('index.index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+      Home
+    </a>
+  </li>
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+      Dashboard
+    </a>
+  </li>
+  <!--
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+      Orders
+    </a>
+  </li>
+  -->
+  <li>
+    <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+      Devices
+    </a>
+  </li>
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+      Users
+    </a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div>
+  <h1>Device Summary</h1>
+    </br>
+    <div class="container">
+        {% if device %}
+        <table class="table">
+            <tbody>
+              <tr>
+                <td><b>Device TAG:</b></td>
+                <td>{{ device.tag }}</td>
+              </tr>
+              <tr>
+                <td><b>Device Name:</b></td>
+                <td>{{ device.name }}</td>
+              </tr>
+              <tr>
+                <td><b>Device Type:</b></td>
+                <td>{{ device.device_type }}</td>
+              </tr>
+              <tr>
+                <td><b>Description:</b></td>
+                <td>{{ device.description }}</td>
+              </tr>
+            </tbody>
+          </table>
+        {% endif %}
+        </br>
+        <div class="row">
+            <h3>Actions</h3>
+            <div class="col-sm">
+                <a class="btn btn-primary btn-sm" href="#" role="button">Update Device</a>
+                <a class="btn btn-danger btn-sm" href="#" role="button">Delete Device</a>
+            </div>
+            
+        </div>
+        </br>
+        <div class="row">
+            <div class="col-sm">
+                <h5>Internal Devices</h5>
+                <a class="btn btn-success btn-sm" href="#" role="button">Add</a>
+                <a class="btn btn-danger btn-sm" href="#" role="button">Delete</a>
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">TAG</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>A002</td>
+                        <td>Sensor Temperatura</td>
+                        <td>SENSOR</td>
+                        <td><a class="btn btn-success btn-sm" href="#" role="button">details</a></td>
+                      </tr>
+                      <tr>
+                        <td>A003</td>
+                        <td>Sensor Presión</td>
+                        <td>SENSOR</td>
+                        <td><a class="btn btn-success btn-sm" href="#" role="button">details</a></td>
+                      </tr>
+                      <tr>
+                        <td>A004</td>
+                        <td>Sensor Humedad</td>
+                        <td>SENSOR</td>
+                        <td><a class="btn btn-success btn-sm" href="#" role="button">details</a></td>
+                      </tr>
+                    </tbody>
+                  </table>                  
+            </div>
+            <div class="col-sm">
+                <h5>Device Properties</h5>
+                <a class="btn btn-success btn-sm" href="#" role="button">Add</a>
+                <a class="btn btn-danger btn-sm" href="#" role="button">Delete</a>
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Value</th>
+                        <th scope="col">Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Marca</td>
+                        <td>Electrodata</td>
+                        <td>Sensor Integral Ambiental</td>
+                      </tr>
+                    </tbody>
+                  </table>      
+            </div>
+        </div>        
+    </div>
+</div>
+
+{% endblock %}

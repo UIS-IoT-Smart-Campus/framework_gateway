@@ -21,7 +21,8 @@ class Device():
             self.id = cursor[0]
             self.tag = cursor[1]
             self.name = cursor[2]
-            self.description = cursor[3]
+            self.device_type = cursor[3]
+            self.description = cursor[4]
 
 
     

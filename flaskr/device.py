@@ -67,6 +67,13 @@ def create():
 
     return render_template('device/create.html')
 
+@bp.route('/<int:id>/view', methods=['GET'])
+@login_required
+def device_view(id):
+    """ Devices View Section"""
+    device = DeviceModel.get_device_id(id)
+    return render_template('device/device_detail.html', device=device)
+
 
 @bp.route('/get_data', methods=('GET', 'POST'))
 #@login_required

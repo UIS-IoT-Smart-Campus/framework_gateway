@@ -27,6 +27,18 @@ class DeviceModel():
         device.set_cursor(device_cursor)
         return device
     
+    @staticmethod
+    def get_device_id(id):
+        db = get_db()
+        device_cursor = db.execute(
+                'SELECT id, tagGlobal, name, device_type, description'
+                ' FROM device'
+                ' WHERE id == ?',(id,)
+            ).fetchone()
+        device = Device()
+        device.set_cursor(device_cursor)
+        return device
+    
 
     @staticmethod
     def create_device(device):
