@@ -50,21 +50,29 @@ def create_app(test_config=None):
     @mqtt.on_connect()
     def handle_connect(client, userdata, flags, rc):
         mqtt.unsubscribe_all()
+        #For get devices data
         mqtt.subscribe('device/data')
+        #For get gateway sensor data
+        mqtt.subscribe('gateway/record')
 
     #If a message is sent by broker
     @mqtt.on_message()
     def handle_mqtt_message(client, userdata, message):
-        msg = MQTT_Converter(message.payload.decode("utf-8"))
-        if msg["device_tag"]:
-            with app.app_context():
-                device = DeviceModel.get_device_tag(msg["device_tag"])
-            if device.id is not None:
-                pst.insert_message(msg,device)
+        if message.topic == 'device/data':
+            msg = MQTT_Converter(message.payload.decode("utf-8"))
+            if msg["device_tag"]:
+                with app.app_context():
+                    device = DeviceModel.get_device_tag(msg["device_tag"])
+                if device.id is not None:
+                    pst.insert_message(msg,device)
+                else:
+                    print("Error not device")
             else:
-                print("Error not device")
-        else:
-            print("Error: Not tag device register")
+                print("Error: Not tag device register")
+        
+        if message.topic == 'gateway/record':
+            msg = MQTT_Converter(message.payload.decode("utf-8"))
+            pst.insert_gateway_record(msg)
     
     #Registrar gestion de la base de datos en la app
     from . import db

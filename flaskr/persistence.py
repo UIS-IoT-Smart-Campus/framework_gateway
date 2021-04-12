@@ -23,4 +23,16 @@ class Persistence():
                 value+=1
             values["time"] = msg["time"]
             table.insert(values)
+    
+    def insert_gateway_record(self,msg):
+        db = TinyDB('flaskr/device_data/Gateway/gateway_records.json')
+        table = db.table('gateway_records')
+        values = {}
+        value = 0
+        for key in msg["keys"]:
+            values[key] = msg["values"][value]
+            value+=1
+        values["time"] = msg["time"]
+        table.insert(values)
+
 

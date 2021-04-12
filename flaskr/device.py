@@ -77,7 +77,7 @@ def device_view(id):
 
 @bp.route('/get_data', methods=('GET', 'POST'))
 #@login_required
-def temp_lebrija():
+def get_data():
     device_tag = request.args.get('device_tag',None)
     table = request.args.get('device_table',None)
     if device_tag and table:
