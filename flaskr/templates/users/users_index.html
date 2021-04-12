@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %}Index{% endblock %}
+{% block title %}Devices{% endblock %}
 
 {% block header %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/devices.css') }}">
 {% endblock %}
 
 {% block menu %}
 <ul class="nav nav-pills flex-column mb-auto">
   <li class="nav-item">
-    <a href="#" class="nav-link active">
+    <a href="{{ url_for('index.index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
       Home
     </a>
@@ -29,13 +29,13 @@
   </li>
   -->
   <li>
-    <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
+    <a href="{{ url_for('devices.devices_index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
       Devices
     </a>
   </li>
   <li>
-    <a href="#" class="nav-link text-white">
+    <a href="#" class="nav-link active">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
       Users
     </a>
@@ -45,8 +45,8 @@
 
 {% block content %}
 <div>
-  <h1>Welcome</h1>
-  <p>This is the home page of the gateway.</p>
+  <h1>Users</h1>
+  <p>Users Page in construction.</p>  
 </div>
     
 {% endblock %}

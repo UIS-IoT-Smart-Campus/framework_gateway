@@ -7,6 +7,8 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
+from flaskr.models.models import DeviceModel
+from flaskr.popyo.device import Device
 from flask import request
 
 from flask import jsonify
@@ -17,53 +19,50 @@ import os
 
 bp = Blueprint('device', __name__, url_prefix='/device')
 
+
+
+@bp.route('/')
+@login_required
+def device_index():
+    """ Devices Index Section"""
+    devices = DeviceModel.get_all()
+    return render_template('device/device_index.html', devices=devices)
+
+
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
     """View for create devices"""
     if request.method == 'POST':
+
         tag = request.form['tag']
         name = request.form['name']
+        device_type = request.form['device_type']
         description = request.form['description']
         error = None
 
-        if not tag:
-            error = 'Tag is required.'
+        if not tag or not name or not device_type:
+            error = 'No mandatory property is set.'
         else:
-            db = get_db()
-            tag_repeated = db.execute(
-                'SELECT tagGlobal'
-                ' FROM device'
-                ' WHERE tagGlobal == ?',(tag,)
-            ).fetchone()
-
-            if tag_repeated is not None:
-                error = "The tag is already exist."
-        
-        if not name:
-            error = "Name is required"
+            device = DeviceModel.get_device_tag(tag)
+            if device.tag is not None:
+                error = "The tag is already exist."      
 
         if error is not None:
             flash(error)
-        else:
-            
+        else:            
             try:
                 directory = "flaskr/device_data/"+tag
                 if not os.path.exists(directory):
                     os.makedirs(directory)
-                db = get_db()
-                db.execute(
-                    'INSERT INTO device (tagGlobal, device_name, device_description)'
-                    ' VALUES (?, ?, ?)',
-                    (tag, name, description)
-                )
-                db.commit()
-
-                return redirect(url_for('index.index'))
+                device = Device()
+                device.set_data(tag,name,device_type,description)
+                DeviceModel.create_device(device)
+                return redirect(url_for('device.device_index'))
 
             except OSError as e:
                 flash("Creation of the directory %s failed" % tag)
-            except Exception:
+            except Exception as e:
                 flash("DB Creation Failed")
 
     return render_template('device/create.html')

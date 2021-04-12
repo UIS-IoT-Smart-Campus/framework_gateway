@@ -11,7 +11,7 @@ bp = Blueprint('index', __name__)
 
 
 @bp.route('/')
+@login_required
 def index():
     """ Index de la app"""
-    devices = DeviceModel.get_all()
-    return render_template('index.html', devices=devices)
+    return render_template('index.html')

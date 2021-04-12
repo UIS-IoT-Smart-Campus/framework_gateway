@@ -9,9 +9,9 @@ class DeviceModel():
     def get_all():
         db = get_db()
         devices = db.execute(
-            'SELECT p.id, tagGlobal, device_name, device_description'
+            'SELECT p.id, tagGlobal, name, device_type, description'
             ' FROM device p'
-            ' ORDER BY device_name DESC'
+            ' ORDER BY name DESC'
             ).fetchall()
         return devices
     
@@ -19,10 +19,21 @@ class DeviceModel():
     def get_device_tag(tag):
         db = get_db()
         device_cursor = db.execute(
-                'SELECT id, tagGlobal, device_name, device_description'
+                'SELECT id, tagGlobal, name, device_type, description'
                 ' FROM device'
                 ' WHERE tagGlobal == ?',(tag,)
             ).fetchone()
         device = Device()
         device.set_cursor(device_cursor)
         return device
+    
+
+    @staticmethod
+    def create_device(device):
+        db = get_db()
+        db.execute(
+            'INSERT INTO device (tagGlobal, name, device_type, description)'
+            ' VALUES (?, ?, ?, ?)',
+            (device.tag, device.name, device.device_type, device.description)
+        )
+        db.commit()

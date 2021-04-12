@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Devices{% endblock %}
+
+{% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/devices.css') }}">
+{% endblock %}
+
+{% block menu %}
+<ul class="nav nav-pills flex-column mb-auto">
+  <li class="nav-item">
+    <a href="{{ url_for('index.index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+      Home
+    </a>
+  </li>
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+      Dashboard
+    </a>
+  </li>
+  <!--
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+      Orders
+    </a>
+  </li>
+  -->
+  <li>
+    <a href="#" class="nav-link active">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+      Devices
+    </a>
+  </li>
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+      Users
+    </a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div>
+  <h1>Devices</h1>
+  <p>In this section you can create, modify and delete devices, check devices properties and status.</p>
+  <h3>Actions</h3>
+  <div class="device_actions">
+    <a class="btn btn-success" href="{{ url_for('device.create') }}" role="button">Create Device</a>
+  </div>
+  </br>
+  <h3>Devices List</h3>
+  <div class="devices_list">
+    <table class="table">
+        <tr>
+          <th>TAG</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Details</th>
+        </tr>
+        {% for device in devices %}
+          <tr>
+            <td>{{ device['tagGlobal'] }}</td>
+            <td>{{ device['name'] }}</td>
+            <td>{{ device['device_type'] }}</td>
+            <td><a class="btn btn-success btn-sm" href="#" role="button">Details</a></td>
+          </tr>
+        {% endfor %}
+      </table>
+  </div>  
+</div>
+    
+{% endblock %}
