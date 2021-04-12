@@ -21,7 +21,7 @@ client_id = 'python-mqtt-GAT001'
 #Message Parameter
 keys = ["cpu","ram"]
 values = [0,0]
-delay_time = 60
+delay_time = 1800
 
 
 
