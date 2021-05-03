@@ -24,3 +24,13 @@ bp = Blueprint('gateway', __name__, url_prefix='/gateway')
 def get_records():
     data = Persistence().get_gateway_records()
     return jsonify(data)
+
+
+@bp.route('/settings', methods=('GET', 'POST'))
+#@login_required
+def settings():
+    if request.method == 'POST':
+        os.system('sudo reboot now')
+        return render_template('gateway/settings.html')
+    else:
+        return render_template('gateway/settings.html')

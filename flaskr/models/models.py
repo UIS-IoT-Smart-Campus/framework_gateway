@@ -49,3 +49,14 @@ class DeviceModel():
             (device.tag, device.name, device.device_type, device.description)
         )
         db.commit()
+    
+    @staticmethod
+    def update_device(device):
+        db = get_db()
+        #Update Device
+        db.execute(
+            'UPDATE device'
+            ' SET name=?, device_type=?, description=? WHERE id = ?',
+            (device.name, device.device_type, device.description, device.id)
+        )
+        db.commit()

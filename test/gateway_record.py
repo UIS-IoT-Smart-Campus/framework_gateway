@@ -19,7 +19,7 @@ port = 1883
 topic = "gateway/record"
 client_id = 'python-mqtt-GAT001'
 #Message Parameter
-keys = ["cpu","ram"]
+keys = ["cpu","ram","temperature"]
 values = [0,0]
 delay_time = 1800
 
@@ -31,9 +31,11 @@ Function to connect to mqtt broker
 def connect_mqtt():
     def on_connect(client, userdata, flags, rc):
         if rc == 0:
-            print("Connected to MQTT Broker!")
+            pass
+            #print("Connected to MQTT Broker!")
         else:
-            print("Failed to connect, return code %d\n", rc)
+            pass
+            #print("Failed to connect, return code %d\n", rc)
 
     client = mqtt_client.Client(client_id)
     # client.username_pw_set(username, password)
@@ -49,9 +51,12 @@ def publish(client):
     while True:
         cpu_usage = psutil.cpu_percent()
         memory_usage = psutil.virtual_memory().percent
+        temperature = psutil.sensors_temperatures()["cpu_thermal"][0][1]
+        
         values = []
         values.append(cpu_usage)
         values.append(memory_usage)
+        values.append(temperature)
         
         tz_Col = pytz.timezone('America/Bogota')
         now = datetime.now(tz_Col)
@@ -64,7 +69,7 @@ def publish(client):
         status = result[0]
         if status == 0:
             pass
-            print(f"Send `{msg}` to topic `{topic}`")
+            #print(f"Send `{msg}` to topic `{topic}`")
         else:
             pass
             #print(f"Failed to send message to topic {topic}")

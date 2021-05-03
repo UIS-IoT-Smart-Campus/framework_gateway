@@ -29,6 +29,7 @@ def device_index():
     return render_template('device/device_index.html', devices=devices)
 
 
+#Create Device
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
@@ -66,6 +67,33 @@ def create():
                 flash("DB Creation Failed")
 
     return render_template('device/create.html')
+
+#Edit Device
+@bp.route('/edit_device/<int:id>', methods=('GET', 'POST'))
+@login_required
+def edit_device(id):
+    device = DeviceModel.get_device_id(id)
+    """View for create devices"""
+    if request.method == 'POST':
+
+        name = request.form['name']
+        device_type = request.form['device_type']
+        description = request.form['description']
+        
+        try:
+            device.name = name
+            device.device_type = device_type
+            device.description = description
+            DeviceModel.update_device(device)
+
+            return redirect(url_for('device.device_view',id = device.id))
+
+        except Exception as e:
+            print(e)
+            flash("DB Creation Failed")
+
+    return render_template('device/edit.html',device=device)
+
 
 @bp.route('/<int:id>/view', methods=['GET'])
 @login_required

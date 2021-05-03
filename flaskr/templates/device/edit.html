@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+
+{% block title %}New Device{% endblock %}
+
+{% block menu %}
+<ul class="nav nav-pills flex-column mb-auto">
+  <li class="nav-item">
+    <a href="{{ url_for('index.index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+      Home
+    </a>
+  </li>
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+      Dashboard
+    </a>
+  </li>
+  <!--
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+      Orders
+    </a>
+  </li>
+  -->
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+      Devices
+    </a>
+  </li>
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+      Users
+    </a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div>
+  <h1>Devices</h1>
+  <p>Then you can edit the device general data.</p>
+  {% if device %}
+  <form method="post">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm form-group">
+          <label for="tag">Device Tag</label>
+          <input name="tag" id="tag" class="form-control" value="{{device.tag }}" readonly required>
+        </div>
+        <div class="col-sm form-group">
+          <label for="name">Device Name</label>
+          <input name="name" id="name" class="form-control" value="{{device.name  }}" required>
+        </div>
+        <div class="col-sm form-group">
+          <label for="device_type" >Device Type:</label>
+          <select name="device_type" id="device_type" class="form-control form-control-s" required>
+            {% if device.device_type == 'COMPOUND' %}
+            <option value="COMPOUND" selected>Compound</option>
+            <option value="COMPOUND SENSOR">Compound Sensor</option>
+            <option value="COMPOUND ACTUATOR">Compound Actuator</option>
+            <option value="SENSOR">Sensor</option>
+            <option value="device_type">Actuator</option>
+            {% elif device.type == 'COMPOUND SENSOR' %}
+            <option value="COMPOUND">Compound</option>
+            <option value="COMPOUND SENSOR" selected>Compound Sensor</option>
+            <option value="COMPOUND ACTUATOR">Compound Actuator</option>
+            <option value="SENSOR">Sensor</option>
+            <option value="ACTUATOR">Actuator</option>
+            {% elif device.device_type == 'COMPOUND ACTUATOR' %}
+            <option value="COMPOUND">Compound</option>
+            <option value="COMPOUND SENSOR">Compound Sensor</option>
+            <option value="COMPOUND ACTUATOR" selected>Compound Actuator</option>
+            <option value="SENSOR">Sensor</option>
+            <option value="ACTUATOR">Actuator</option>
+            {% elif device.device_type == 'SENSOR' %}
+            <option value="COMPOUND">Compound</option>
+            <option value="COMPOUND SENSOR">Compound Sensor</option>
+            <option value="COMPOUND ACTUATOR">Compound Actuator</option>
+            <option value="SENSOR" selected>Sensor</option>
+            <option value="ACTUATOR">Actuator</option>
+            {% elif device.device_type == 'ACTUATOR' %}
+            <option value="COMPOUND">Compound</option>
+            <option value="COMPOUND SENSOR">Compound Sensor</option>
+            <option value="COMPOUND ACTUATOR">Compound Actuator</option>
+            <option value="SENSOR">Sensor</option>
+            <option value="ACTUATOR" selected>Actuator</option>
+            {% endif %}           
+          </select>
+        </div>
+      </div>
+    </br>
+      <div class="row">
+        <div class="col-sm ">
+          <label for="description">Device Description</label>
+          <textarea name="description" id="description" class="form-control">{{device.description }}</textarea>
+        </div>
+      </div>
+    </br>
+      <div class="row">
+        <div class="col-sm ">
+          <input type="submit" class="btn btn-warning" value="Save Device">
+          <a class="btn btn-danger" href="{{ url_for('device.edit_device', id=device.id ) }}" role="button"> Cancel</a>
+        </div>
+      </div>
+    </div>
+  </form>
+  {% else %}
+  <h3>Device not found</h3>
+  {% endif %}
+</div>
+
+{% endblock %}
