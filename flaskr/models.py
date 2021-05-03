@@ -2,12 +2,19 @@
 #from flaskr.db import get_db
 #from flaskr.popyo.device import Device
 
-from ..app import db
+from app import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    pw_hash = db.Column(db.String(80))
+    password = db.Column(db.String(80), nullable=False)
+
+class Device(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    tag = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(80), nullable=False)
+    device_type = db.Column(db.String(80), nullable=False)
+    description = db.Column(db.String(80), nullable=False)
 
 """
 class DeviceModel():
