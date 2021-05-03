@@ -63,7 +63,7 @@
         </tr>
         {% for device in devices %}
           <tr>
-            <td>{{ device['tagGlobal'] }}</td>
+            <td>{{ device['tag'] }}</td>
             <td>{{ device['name'] }}</td>
             <td>{{ device['device_type'] }}</td>
             <td><a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=device['id']) }}" role="button">Details</a></td>

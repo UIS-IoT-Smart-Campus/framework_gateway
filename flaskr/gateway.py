@@ -4,12 +4,12 @@ from flask import (
 
 from werkzeug.exceptions import abort
 
-from flaskr.auth import login_required
-from flaskr.db import get_db
-from flask import request
-from flaskr.persistence import Persistence
+from auth import login_required
+from persistence import Persistence
+from app import db
 
 from flask import jsonify
+from flask import request
 import json
 from tinydb import TinyDB, Query
 

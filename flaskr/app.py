@@ -1,8 +1,8 @@
 import os
 
 from flask import Flask
-#from flask_mqtt import Mqtt
-#from flaskr.persistence import Persistence
+from flask_mqtt import Mqtt
+from persistence import Persistence
 #from flaskr.models.models import DeviceModel
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -45,14 +45,28 @@ except OSError:
     pass
 
 #Models
-from models import User
+from models import User,Device
 
 #Registrar espacio de trabajo para login y registro
 import auth
 app.register_blueprint(auth.bp)
 
+#Registrar espacio de trabajo para el index
+import index
+app.register_blueprint(index.bp)
+app.add_url_rule('/', endpoint='index')
 
-"""   
+#Registrar espacio de tabajo para devices
+import device
+app.register_blueprint(device.bp)
+app.add_url_rule('/device', endpoint='index')
+
+#Registrar espacio de tabajo para devices
+import gateway
+app.register_blueprint(gateway.bp)
+app.add_url_rule('/gateway', endpoint='index')
+
+
 #MQTT registration
 #from . import mqtt
 #mqtt.init_app(app)
@@ -79,8 +93,8 @@ def handle_mqtt_message(client, userdata, message):
         msg = MQTT_Converter(message.payload.decode("utf-8"))
         if msg["device_tag"]:
             with app.app_context():
-                device = DeviceModel.get_device_tag(msg["device_tag"])
-            if device.id is not None:
+                device = Device.query.filter_by(tag=tag).first()
+            if device is not None:
                 pst.insert_message(msg,device)
             else:
                 print("Error not device")
@@ -94,25 +108,3 @@ def handle_mqtt_message(client, userdata, message):
 #Registrar gestion de la base de datos en la app
 #from . import db
 #db.init_app(app)
-
-
-
-#Registrar espacio de tabajo para el index
-from . import index
-app.register_blueprint(index.bp)
-app.add_url_rule('/', endpoint='index')
-
-#Registrar espacio de tabajo para devices
-from . import device
-app.register_blueprint(device.bp)
-app.add_url_rule('/device', endpoint='index')
-
-#Registrar espacio de tabajo para devices
-from . import gateway
-app.register_blueprint(gateway.bp)
-app.add_url_rule('/gateway', endpoint='index')
-
-
-if __name__=="__main__":
-    serve(app, host='0.0.0.0',port=5000, url_scheme='https')
-"""
