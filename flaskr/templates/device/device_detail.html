@@ -43,11 +43,24 @@
 {% block content %}
 
 <div>
-  <h1>Device Summary</h1>
+  <h1>Device</h1>
     </br>
-    <div class="container">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="sumary-tab" data-bs-toggle="tab" data-bs-target="#sumary" type="button" role="tab" aria-controls="sumary" aria-selected="true">Sumary</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="properties-tab" data-bs-toggle="tab" data-bs-target="#properties" type="button" role="tab" aria-controls="properties" aria-selected="false">Properties</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">Contact</button>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="sumary" role="tabpanel" aria-labelledby="sumary-tab">
         {% if device %}
         <table class="table">
+            <br>
             <tbody>
               <tr>
                 <td><b>Device TAG:</b></td>
@@ -68,6 +81,34 @@
             </tbody>
           </table>
         {% endif %}
+      </div>
+      <div class="tab-pane fade" id="properties" role="tabpanel" aria-labelledby="properties-tab">
+          <br><br>
+          <div class="col-sm">
+                <h5>Device Properties</h5>
+                <a class="btn btn-success btn-sm" href="#" role="button">Add</a>
+                <a class="btn btn-danger btn-sm" href="#" role="button">Delete</a>
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Value</th>
+                        <th scope="col">Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Marca</td>
+                        <td>Electrodata</td>
+                        <td>Sensor Integral Ambiental</td>
+                      </tr>
+                    </tbody>
+                  </table>      
+            </div>
+      </div>
+      <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
+    </div>
+        
         </br>
         <div class="row">
             <h3>Actions</h3>
@@ -114,27 +155,7 @@
                     </tbody>
                   </table>                  
             </div>
-            <div class="col-sm">
-                <h5>Device Properties</h5>
-                <a class="btn btn-success btn-sm" href="#" role="button">Add</a>
-                <a class="btn btn-danger btn-sm" href="#" role="button">Delete</a>
-                <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Value</th>
-                        <th scope="col">Description</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Marca</td>
-                        <td>Electrodata</td>
-                        <td>Sensor Integral Ambiental</td>
-                      </tr>
-                    </tbody>
-                  </table>      
-            </div>
+           
         </div>        
     </div>
 </div>
