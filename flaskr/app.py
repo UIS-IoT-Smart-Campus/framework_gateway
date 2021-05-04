@@ -93,7 +93,7 @@ def handle_mqtt_message(client, userdata, message):
         msg = MQTT_Converter(message.payload.decode("utf-8"))
         if msg["device_tag"]:
             with app.app_context():
-                device = Device.query.filter_by(tag=tag).first()
+                device = Device.query.filter_by(tag= msg["device_tag"]).first()
             if device is not None:
                 pst.insert_message(msg,device)
             else:

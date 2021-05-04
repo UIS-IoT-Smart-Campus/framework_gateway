@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Delete Device{% endblock %}
+
+{% block menu %}
+<ul class="nav nav-pills flex-column mb-auto">
+  <li class="nav-item">
+    <a href="{{ url_for('index.index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+      Home
+    </a>
+  </li>
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+      Dashboard
+    </a>
+  </li>
+  <!--
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+      Orders
+    </a>
+  </li>
+  -->
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+      Devices
+    </a>
+  </li>
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+      Users
+    </a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div>
+  <h1>Delete Device</h1>
+  <h4>¿Are you sure to remove the device with tag: {{ device.tag }}?</h4><br>
+  <form method="post">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm ">
+          <input type="submit" class="btn btn-danger" value="Delete Device">
+          <a class="btn btn-warning" href="{{ url_for('device.device_view', id=device.id ) }}" role="button"> Cancel</a>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

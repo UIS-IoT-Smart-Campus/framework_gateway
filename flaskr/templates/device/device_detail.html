@@ -73,7 +73,7 @@
             <h3>Actions</h3>
             <div class="col-sm">
                 <a class="btn btn-primary btn-sm" href="{{ url_for('device.edit_device', id=device['id']) }}" role="button">Update Device</a>
-                <a class="btn btn-danger btn-sm" href="#" role="button">Delete Device</a>
+                <a class="btn btn-danger btn-sm" href="{{ url_for('device.delete_device', id=device['id']) }}" role="button">Delete Device</a>
             </div>
             
         </div>

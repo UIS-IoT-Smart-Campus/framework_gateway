@@ -52,7 +52,7 @@ def create():
             flash(error)
         else:            
             try:
-                directory = "flaskr/device_data/"+tag
+                directory = "device_data/"+tag
                 if not os.path.exists(directory):
                     os.makedirs(directory)
                 device = Device(tag=tag, name=name, device_type=device_type, description=description)
@@ -100,6 +100,27 @@ def edit_device(id):
     return render_template('device/edit.html',device=device)
 
 
+#Delete Device
+@bp.route('/delete_device/<int:id>', methods=['GET','POST'])
+@login_required
+def delete_device(id):
+    device = Device.query.filter_by(id=id).first()
+    if device is not None:
+        if request.method == 'POST':
+            try:
+                db.session.delete(device)
+                db.session.commit()
+                flash("The device was removed")
+                return redirect(url_for('device.device_index'))
+
+            except Exception as e:
+                flash("DB Creation Failed")
+    else:
+        flash("Device Not Found")
+
+    return render_template('device/delete.html',device=device)
+
+
 @bp.route('/<int:id>/view', methods=['GET'])
 @login_required
 def device_view(id):
@@ -108,13 +129,17 @@ def device_view(id):
     return render_template('device/device_detail.html', device=device)
 
 
+
+"""------------------------------------------------------------------
+Rest API Methods
+-----------------------------------------------------------------"""
 @bp.route('/get_data', methods=('GET', 'POST'))
 #@login_required
 def get_data():
     device_tag = request.args.get('device_tag',None)
     table = request.args.get('device_table',None)
     if device_tag and table:
-        dbn = TinyDB('flaskr/device_data/'+str(device_tag)+'/'+str(device_tag)+'.json')
+        dbn = TinyDB('device_data/'+str(device_tag)+'/'+str(device_tag)+'.json')
         #data = json.load(db.all())
         table = dbn.table(str(table))
         data = table.all()
