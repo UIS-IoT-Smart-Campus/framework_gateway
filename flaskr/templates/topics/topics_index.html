@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}Devices{% endblock %}
+{% block title %}Topics{% endblock %}
 
 {% block header %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/devices.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/topics.css') }}">
 {% endblock %}
 
 {% block menu %}
@@ -21,13 +21,13 @@
     </a>
   </li>
   <li>
-    <a href="{{ url_for('device.device_index') }}" class="nav-link active">
+    <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
       Devices
     </a>
   </li>
   <li>
-    <a href="{{ url_for('topic.topic_index') }}" class="nav-link text-white">
+    <a href="{{ url_for('topic.topic_index') }}" class="nav-link active">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
       Topics
     </a>
@@ -43,28 +43,28 @@
 
 {% block content %}
 <div>
-  <h1>Devices</h1>
-  <p>In this section you can create, modify and delete devices, check devices properties and status.</p>
+  <h1>Topics</h1>
+  <p>In this section you can create, modify and delete topics, check topics properties and status.</p>
   <h3>Actions</h3>
   <div class="device_actions">
-    <a class="btn btn-success" href="{{ url_for('device.create') }}" role="button">Create Device</a>
+    <a class="btn btn-success" href="{{ url_for('topic.create_topic') }}" role="button">Create Topic</a>
   </div>
   </br>
-  <h3>Devices List</h3>
+  <h3>List of Topics</h3>
   <div class="devices_list">
     <table class="table">
         <tr>
-          <th>TAG</th>
-          <th>Name</th>
-          <th>Type</th>
+          <th>Topic</th>
+          <th>Last Update</th>
+          <th>Active Devices</th>
           <th>Details</th>
         </tr>
-        {% for device in devices %}
+        {% for topic in topics %}
           <tr>
-            <td>{{ device['tag'] }}</td>
-            <td>{{ device['name'] }}</td>
-            <td>{{ device['device_type'] }}</td>
-            <td><a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=device['id']) }}" role="button">Details</a></td>
+            <td>{{ topic['topic'] }}</td>
+            <td>{{ topic['last_update'] }}</td>
+            <td>{{ topic['active_devices'] }}</td>
+            <td><a class="btn btn-success btn-sm" href="{{ url_for('topic.topic_view', id=topic['id']) }}" role="button">Details</a></td>
           </tr>
         {% endfor %}
       </table>

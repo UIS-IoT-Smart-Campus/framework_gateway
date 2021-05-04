@@ -11,20 +11,20 @@ It's a python framework gateway for IoT based on Flask framework and MQTT broker
 
 ## Important: Create database
 
-Inside the folder flaskr enter on python shell and execute the follows commands: 
+Inside the folder flaskr enter on python shell and execute the following commands: 
 
 - from app import db
 - db.create_all()
 
 ## For run on development enviroment
 
-Create the next enviroment variables:
+Create the next temporal enviroment variables:
 
-export FLASK_APP=app
-export FLASK_ENV=development
-export FLASK_DEBUG=0
+- export FLASK_APP=app
+- export FLASK_ENV=development
+- export FLASK_DEBUG=0
 
-Inside the folder flaskr run the follow comand:
+Inside the folder flaskr run the following comand:
 
 flask run -h 0.0.0.0 -p 5000
 

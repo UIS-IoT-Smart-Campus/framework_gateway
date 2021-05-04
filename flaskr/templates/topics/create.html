@@ -1,15 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Index{% endblock %}
 
-{% block header %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-{% endblock %}
+{% block title %}New Topic{% endblock %}
 
 {% block menu %}
 <ul class="nav nav-pills flex-column mb-auto">
   <li class="nav-item">
-    <a href="#" class="nav-link active">
+    <a href="{{ url_for('index.index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
       Home
     </a>
@@ -21,13 +18,13 @@
     </a>
   </li>
   <li>
-    <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
+    <a href="#" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
       Devices
     </a>
-  </li>  
+  </li>
   <li>
-    <a href="{{ url_for('topic.topic_index') }}" class="nav-link text-white">
+    <a href="#" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
       Topics
     </a>
@@ -43,8 +40,25 @@
 
 {% block content %}
 <div>
-  <h1>Welcome</h1>
-  <p>This is the home page of the gateway.</p>
+  <h1>Create Topic</h1>
+  <p>Then you can create a new topic.</p>
+  <form method="post">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm form-group">
+          <label for="topic">Topic</label>
+          <input name="topic" id="topic" class="form-control" value="{{ request.form['topic'] }}" size="50" required>
+        </div>
+      </div>
+      <br><br>
+      <div class="row">
+        <div class="col-sm ">
+          <input type="submit" class="btn btn-success" value="Create Topic">
+          <a class="btn btn-danger" href="{{ url_for('topic.topic_index') }}" role="button"> Cancel</a>
+        </div>
+      </div>
+    </div>
+  </form>
 </div>
-    
+
 {% endblock %}

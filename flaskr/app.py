@@ -45,7 +45,7 @@ except OSError:
     pass
 
 #Models
-from models import User,Device
+from models import User,Device,Topic
 
 #Registrar espacio de trabajo para login y registro
 import auth
@@ -56,12 +56,17 @@ import index
 app.register_blueprint(index.bp)
 app.add_url_rule('/', endpoint='index')
 
-#Registrar espacio de tabajo para devices
+#Registrar espacio de trabajo para devices
 import device
 app.register_blueprint(device.bp)
 app.add_url_rule('/device', endpoint='index')
 
-#Registrar espacio de tabajo para devices
+#Registrar espacio de trabajo para devices
+import topic
+app.register_blueprint(topic.bp)
+app.add_url_rule('/topic', endpoint='index')
+
+#Registrar espacio de trabajo para el gateway
 import gateway
 app.register_blueprint(gateway.bp)
 app.add_url_rule('/gateway', endpoint='index')

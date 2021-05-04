@@ -15,6 +15,7 @@ from tinydb import TinyDB, Query
 from app import db
 
 import os
+import shutil
 
 bp = Blueprint('device', __name__, url_prefix='/device')
 
@@ -108,13 +109,17 @@ def delete_device(id):
     if device is not None:
         if request.method == 'POST':
             try:
+                dirc= 'device_data/'+device.tag+'/'
+                #Delete the database register
                 db.session.delete(device)
                 db.session.commit()
+                #Delete the folder and NOSQL database for the device.                
+                shutil.rmtree(dirc)
                 flash("The device was removed")
                 return redirect(url_for('device.device_index'))
 
             except Exception as e:
-                flash("DB Creation Failed")
+                flash("DB Creation Failed - %s".format(e))
     else:
         flash("Device Not Found")
 
