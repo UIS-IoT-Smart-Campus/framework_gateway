@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 
-{% block title %}New Device{% endblock %}
+{% block title %}New Property{% endblock %}
 
 {% block menu %}
 <ul class="nav nav-pills flex-column mb-auto">
@@ -40,42 +40,32 @@
 
 {% block content %}
 <div>
-  <h1>Devices</h1>
-  <p>Then you can create a new device.</p>
+  <h1>Property</h1>
+  <p>Then you can create a new property.</p>
   <form method="post">
     <div class="container">
       <div class="row">
         <div class="col-sm form-group">
-          <label for="tag">Device Tag</label>
-          <input name="tag" id="tag" class="form-control" value="{{ request.form['tag'] }}" required>
-        </div>
-        <div class="col-sm form-group">
-          <label for="name">Device Name</label>
+          <label for="name">Property Name</label>
           <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>
         </div>
         <div class="col-sm form-group">
-          <label for="device_type" >Device Type:</label>
-          <select name="device_type" id="device_type" class="form-control form-control-s" required>
-            <option value="COMPOUND">Compound</option>
-            <option value="COMPOUND SENSOR">Compound Sensor</option>
-            <option value="COMPOUND ACTUATOR">Compound Actuator</option>
-            <option value="SENSOR">Sensor</option>
-            <option value="ACTUATOR">Actuator</option>
-          </select>
-        </div>
+          <label for="value">Property Value</label>
+          <input name="value" id="value" class="form-control" value="{{ request.form['value'] }}" required>
+        </div>        
       </div>
     </br>
       <div class="row">
         <div class="col-sm ">
-          <label for="description">Device Description</label>
+          <label for="description">Property Description</label>
           <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
         </div>
       </div>
     </br>
       <div class="row">
         <div class="col-sm ">
-          <input type="submit" class="btn btn-success" value="Create Device">
-          <a class="btn btn-danger" href="{{ url_for('device.device_index') }}" role="button"> Cancel</a>
+          <input type="submit" class="btn btn-success" value="Create Property">
+          <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device['id']) }}" role="button"> Cancel</a>
         </div>
       </div>
     </div>

@@ -90,22 +90,25 @@
           <br>
           <div class="col-sm">
                 <h5>Device Properties</h5>
-                <a class="btn btn-success btn-sm" href="#" role="button">Add</a>
-                <a class="btn btn-danger btn-sm" href="#" role="button">Delete</a>
+                <a class="btn btn-success btn-sm" href="{{ url_for('device.create_property', id=device['id']) }}" role="button">Add</a>                
                 <table class="table">
                     <thead>
                       <tr>
                         <th scope="col">Name</th>
                         <th scope="col">Value</th>
                         <th scope="col">Description</th>
+                        <th scope="col">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
+                      {% for property in properties %}
                       <tr>
-                        <td>Marca</td>
-                        <td>Electrodata</td>
-                        <td>Sensor Integral Ambiental</td>
+                        <td>{{ property['name'] }}</td>
+                        <td>{{ property['value'] }}</td>
+                        <td>{{ property['description'] }}</td>
+                        <td><a class="btn btn-danger btn-sm" href="{{ url_for('device.delete_property', id=property['id'] ) }}" role="button">Delete</a></td>
                       </tr>
+                      {% endfor %}
                     </tbody>
                   </table>      
             </div>

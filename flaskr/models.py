@@ -38,7 +38,7 @@ class Property(db.Model):
     name = db.Column(db.String(80), nullable=False)
     value = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(200))
-    sensor_id = db.Column(db.Integer, db.ForeignKey('device.id'),nullable=False)
+    device_id = db.Column(db.Integer, db.ForeignKey('device.id'),nullable=False)
 
 
 
