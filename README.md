@@ -9,3 +9,23 @@ It's a python framework gateway for IoT based on Flask framework and MQTT broker
 - TinyDB 4.4.0
 - Eclipse Mosquitto
 
+## Important: Create database
+
+Inside the folder flaskr enter on python shell and execute the follows commands: 
+
+- from app import db
+- db.create_all()
+
+## For run on development enviroment
+
+Create the next enviroment variables:
+
+export FLASK_APP=app
+export FLASK_ENV=development
+export FLASK_DEBUG=0
+
+Inside the folder flaskr run the follow comand:
+
+flask run -h 0.0.0.0 -p 5000
+
+You can remplace the port in -p XXXX. 
