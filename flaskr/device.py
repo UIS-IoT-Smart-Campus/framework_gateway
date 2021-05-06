@@ -25,7 +25,7 @@ bp = Blueprint('device', __name__, url_prefix='/device')
 @login_required
 def device_index():
     """ Devices Index Section"""
-    devices = Device.query.all()
+    devices = Device.query.filter_by(device_parent=None)
     return render_template('device/device_index.html', devices=devices)
 
 #Device Detail View
@@ -35,13 +35,15 @@ def device_view(id):
     """ Devices View Section"""
     device = Device.query.filter_by(id=id).first()
     properties = Property.query.filter_by(device_id=id)
-    return render_template('device/device_detail.html', device=device,properties=properties)
+    offspring_devices = Device.query.filter_by(device_parent=device.id)
+    return render_template('device/device_detail.html', device=device,properties=properties,offspring_devices=offspring_devices)
 
 
 #Create Device
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
+    devices = db.session.query(Device).filter(Device.device_type.in_(('COMPOUND','COMPOUND SENSOR','COMPOUND ACTUATOR')))
     """View for create devices"""
     if request.method == 'POST':
 
@@ -49,6 +51,7 @@ def create():
         name = request.form['name']
         device_type = request.form['device_type']
         description = request.form['description']
+        device_parent = request.form['device_parent']
         error = None
 
         if not tag or not name or not device_type:
@@ -65,7 +68,10 @@ def create():
                 directory = "device_data/"+tag
                 if not os.path.exists(directory):
                     os.makedirs(directory)
-                device = Device(tag=tag, name=name, device_type=device_type, description=description)
+                if device_parent != "null":
+                    device = Device(tag=tag, name=name, device_type=device_type, description=description, device_parent=device_parent)
+                else:
+                    device = Device(tag=tag, name=name, device_type=device_type, description=description)
                 db.session.add(device)
                 db.session.commit()
                 return redirect(url_for('device.device_index'))
@@ -75,7 +81,7 @@ def create():
             except Exception as e:
                 flash("DB Creation Failed")
 
-    return render_template('device/create.html')
+    return render_template('device/create.html',devices=devices)
 
 
 #Edit Device

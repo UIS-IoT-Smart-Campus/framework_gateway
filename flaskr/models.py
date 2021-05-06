@@ -25,6 +25,7 @@ class Device(db.Model):
     device_type = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     topics = db.relationship('Topic',secondary=device_topics, lazy='subquery',backref=db.backref('device',lazy=True))
+    device_parent = db.Column(db.Integer, db.ForeignKey('device.id'))
 
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
