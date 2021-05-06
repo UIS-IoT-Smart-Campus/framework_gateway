@@ -1,15 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Index{% endblock %}
 
-{% block header %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-{% endblock %}
+{% block title %}Delete Topic{% endblock %}
 
 {% block menu %}
 <ul class="nav nav-pills flex-column mb-auto">
   <li class="nav-item">
-    <a href="{{ url_for('index.index') }}" class="nav-link active">
+    <a href="{{ url_for('index.index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
       Home
     </a>
@@ -45,8 +42,19 @@
 
 {% block content %}
 <div>
-  <h1>Welcome</h1>
-  <p>This is the home page of the gateway. <br><b>The page is under construction.</b></p>
+  <h1>Delete Topic</h1>
+  <h4>¿Are you sure to remove the topic: {{ topic.topic }}?</h4><br>
+  <p><b>Warning:</b>This action delete the topic properties and all data from topic on devices.</p>
+  <form method="post">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm ">
+          <input type="submit" class="btn btn-danger" value="Delete Topic">
+          <a class="btn btn-warning" href="{{ url_for('topic.topic_view', id=topic.id ) }}" role="button"> Cancel</a>
+        </div>
+      </div>
+    </div>
+  </form>
 </div>
-    
+
 {% endblock %}

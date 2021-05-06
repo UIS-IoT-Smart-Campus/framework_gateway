@@ -12,7 +12,7 @@
     </a>
   </li>
   <li>
-    <a href="#" class="nav-link text-white">
+    <a href="{{ url_for('dashboard.index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
       Dashboard
     </a>
@@ -22,32 +22,33 @@
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
       Devices
     </a>
-  </li>
+  </li>  
   <li>
-    <a href="#" class="nav-link text-white">
+    <a href="{{ url_for('topic.topic_index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
       Topics
     </a>
   </li>
+  <!--
   <li>
     <a href="#" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
       Users
     </a>
   </li>
+  -->
 </ul>
 {% endblock %}
 
 {% block content %}
 
 <div>
-  <h1>Device</h1>
+  <h1>Topic</h1>
     </br>
     <div class="row">
       <h3>Actions</h3>
         <div class="col-sm">
-          <a class="btn btn-primary btn-sm" href="#" role="button">Update Topic</a>
-          <a class="btn btn-danger btn-sm" href="#" role="button">Delete Topic</a>
+          <a class="btn btn-danger btn-sm" href="{{ url_for('topic.delete_topic', id=topic['id']) }}" role="button">Delete Topic</a>
         </div>
     </div><br>
     <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -89,15 +90,17 @@
                       <tr>
                         <th scope="col">Device TAG</th>
                         <th scope="col">Device Name</th>
-                        <th scope="col">Frenquency <sub>(seconds)</sub></th>
+                        <th scope="col">Details</th>
                       </tr>
                     </thead>
                     <tbody>
+                      {% for device in devices %}
                       <tr>
-                        <td>A001</td>
-                        <td>Sensor Ambiental Lebrija</td>
-                        <td>3600</td>
+                        <td>{{ device.tag }}</td>
+                        <td>{{ device.name }}</td>
+                        <td><a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=device['id']) }}" role="button">Details</a></td>
                       </tr>
+                      {% endfor %}
                     </tbody>
                   </table>      
             </div>

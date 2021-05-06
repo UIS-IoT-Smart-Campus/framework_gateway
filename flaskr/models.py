@@ -10,7 +10,6 @@ from datetime import datetime
 device_topics = db.Table('device_topics',
     db.Column('device_id', db.Integer, db.ForeignKey('device.id'), primary_key=True),
     db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'), primary_key=True),
-    db.Column('frequency',db.Integer),
 )
 
 

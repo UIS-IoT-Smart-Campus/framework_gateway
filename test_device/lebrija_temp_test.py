@@ -22,11 +22,40 @@ client_id = 'python-mqtt-A001'
 device_tag = "A001"
 keys = ["temp","feels_like","pressure","humidity"]
 values = [0,0,0,0]
-table = "temp_lebrija"
+device_topic = "temp_lebrija"
 delay_time = 3600
 
 # username = 'emqx'
 # password = 'public'
+
+"""
+Function to create the message.
+"""
+def get_message():
+    resp = requests.get('http://api.openweathermap.org/data/2.5/weather?q=Lebrija,co&APPID=d205eb86c19c0897cf10319745ce283d&units=metric')
+    if resp.status_code != 200:
+        # This means something went wrong.
+        values = [0,0,0,0]
+        pass
+    else:
+        temp= resp.json()["main"]["temp"]
+        feels_like = resp.json()["main"]["feels_like"]
+        pressure = resp.json()["main"]["pressure"]
+        humidity = resp.json()["main"]["humidity"]
+        values = []
+        values.append(temp)
+        values.append(feels_like)
+        values.append(pressure)
+        values.append(humidity)
+    
+    tz_Col = pytz.timezone('America/Bogota')
+    now = datetime.now(tz_Col)
+    current_time = now.strftime("%d-%m-%Y %H:%M:%S")
+
+    msg = {"device_tag":device_tag,"device_topic":device_topic,"keys":keys,"values":values,"time":current_time}
+    msg_json = json.dumps(msg)
+    return msg_json
+    
 
 """
 Function to connect to mqtt broker
@@ -53,29 +82,8 @@ def publish(client):
     msg_count = 0
     while True:
         try:
-            resp = requests.get('http://api.openweathermap.org/data/2.5/weather?q=Lebrija,co&APPID=d205eb86c19c0897cf10319745ce283d&units=metric')
-            if resp.status_code != 200:
-                # This means something went wrong.
-                values = [0,0,0,0]
-                pass
-            else:
-                temp= resp.json()["main"]["temp"]
-                feels_like = resp.json()["main"]["feels_like"]
-                pressure = resp.json()["main"]["pressure"]
-                humidity = resp.json()["main"]["humidity"]
-                values = []
-                values.append(temp)
-                values.append(feels_like)
-                values.append(pressure)
-                values.append(humidity)
-            
-            tz_Col = pytz.timezone('America/Bogota')
-            now = datetime.now(tz_Col)
-            current_time = now.strftime("%d-%m-%Y %H:%M:%S")
-
-            msg = {"device_tag":device_tag,"table":table,"keys":keys,"values":values,"time":current_time}
-            msg_json = json.dumps(msg)
-            result = client.publish(topic, msg_json)
+            msg = get_message()
+            result = client.publish(topic, msg)
             # result: [0, 1]
             status = result[0]
             if status == 0:

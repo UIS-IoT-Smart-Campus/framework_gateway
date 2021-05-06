@@ -2,7 +2,6 @@ import os
 
 from flask import Flask
 from flask_mqtt import Mqtt
-from persistence import Persistence
 #from flaskr.models.models import DeviceModel
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -71,10 +70,17 @@ import gateway
 app.register_blueprint(gateway.bp)
 app.add_url_rule('/gateway', endpoint='index')
 
+#Registrar espacio de trabajo para el gateway
+import dashboard
+app.register_blueprint(dashboard.bp)
+app.add_url_rule('/dashboard', endpoint='index')
+
 
 #MQTT registration
 #from . import mqtt
 #mqtt.init_app(app)
+from persistence import Persistence
+
 mqtt = Mqtt(app)
 pst = Persistence()
 

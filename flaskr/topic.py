@@ -5,7 +5,8 @@ from flask import (
 
 
 from auth import login_required
-from models import Topic
+from models import Topic,Device
+from  persistence import Persistence
 from flask import request
 from app import db
 
@@ -26,7 +27,8 @@ def topic_index():
 def topic_view(id):
     """ Topic View Section"""
     topic = Topic.query.filter_by(id=id).first()
-    return render_template('topics/topic_detail.html', topic=topic)
+    devices = Device.query.with_parent(topic)
+    return render_template('topics/topic_detail.html', topic=topic,devices=devices)
 
 
 
@@ -63,3 +65,35 @@ def create_topic():
                 flash("DB Creation Failed")
 
     return render_template('topics/create.html')
+
+
+
+#Delete Topic
+@bp.route('/delete_topic/<int:id>', methods=['GET','POST'])
+@login_required
+def delete_topic(id):
+    topic = Topic.query.filter_by(id=id).first()
+    if topic is not None:
+        if request.method == 'POST':
+            try:
+                devices = Device.query.with_parent(topic)
+                for device in devices:
+                    print(topic.topic)
+                    delete = Persistence().delete_device_topic(device,topic)
+                    if not delete:
+                        flash("Problems deleting topic from the device")
+                        return render_template('topics/delete.html',device=device)
+
+                #Delete the database register
+                db.session.delete(topic)
+                db.session.commit()
+                flash("The topic was removed")
+                return redirect(url_for('topic.topic_index'))
+
+            except Exception as e:
+                print(e)
+                flash("DB Deleted Failed - %s".format(e))
+    else:
+        flash("Topic Not Found")
+
+    return render_template('topics/delete.html',topic=topic)
