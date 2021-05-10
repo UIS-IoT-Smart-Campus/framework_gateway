@@ -8,7 +8,7 @@ from werkzeug.exceptions import abort
 from auth import login_required
 from models import Device,Property
 
-from flask import request
+from flask import request,Response,make_response
 from flask import jsonify
 import json
 from tinydb import TinyDB, Query
@@ -126,10 +126,14 @@ def delete_device(id):
             try:
                 dirc= 'device_data/'+device.tag+'/'
                 #Delete the database register
+                properties = Property.query.filter_by(device_id=device.id)
+                for proper in properties:
+                    db.session.delete(proper)
                 db.session.delete(device)
                 db.session.commit()
-                #Delete the folder and NOSQL database for the device.                
-                shutil.rmtree(dirc)
+                #Delete the folder and NOSQL database for the device.
+                if os.path.isdir(dirc):
+                    shutil.rmtree(dirc)
                 flash("The device was removed")
                 return redirect(url_for('device.device_index'))
 
@@ -201,6 +205,147 @@ def delete_property(id):
 """------------------------------------------------------------------
 Rest API Methods
 -----------------------------------------------------------------"""
+
+#Devices Rest API
+
+#Get all devices
+@bp.route('/devices', methods=["GET"])
+def get_devices_api():
+    return jsonify(devices=[i.serialize for i in Device.query.all()])
+
+#Get a single device
+@bp.route('/devices/<tag>', methods=["GET"])
+def get_device_api(tag):
+    device = Device.query.filter_by(tag=tag).first()
+    return jsonify(device.serialize)
+
+#Create a Device
+@bp.route('/devices', methods=["POST"])
+def add_device_api():
+    body = request.get_json()
+    tag = body['tag']
+    name = body['name']
+    device_type = body['device_type']
+    description = body['description']
+    device_parent = body['device_parent']
+    properties = body['properties']
+
+    error = None
+
+    if not tag or not name or not device_type:
+        error = {"Error":"No mandatory property is set."}
+        return make_response(jsonify(error),400)
+    else:
+        devices = Device.query.filter_by(tag=tag).first()
+        if devices is not None:
+            error = {"Error":"The device with this tag is already exist."}
+            return make_response(jsonify(error),400)
+        if device_parent is not None:
+            device = Device.query.filter_by(id=device_parent)
+            if device is None:
+                error = {"Error":"The parent device ID not exist."}
+                return make_response(jsonify(error),400)
+        
+        if properties:
+            for proper in properties:
+                keys_list = list(proper.keys())
+                if "name" not in keys_list or "value" not in keys_list or "description" not in keys_list:
+                    error = {"Error":"The properties doesn't have the mandatory attributes."}
+                    return make_response(jsonify(error),400)
+
+        device = Device(tag=tag,name=name,device_type=device_type,description=description,device_parent=device_parent)
+        db.session.add(device)
+        db.session.commit()
+
+        if properties:
+            for proper in properties:
+                proper = Property(name=proper["name"],value=proper["value"],description=proper["description"],device_id=device.id)
+                db.session.add(proper)
+        
+        
+        db.session.commit()        
+        return jsonify(device.serialize)
+
+    return jsonify(devices=[i.serialize for i in Device.query.all()])
+
+#Update device
+@bp.route('/devices/<tag>', methods=["PUT"])
+def update_device_api(tag):
+    device = Device.query.filter_by(tag=tag).first()
+    
+    if device is not None:
+        name = request.json['name']
+        device_type = request.json['device_type']
+        description = request.json['description']
+        device_parent = request.json['device_parent']
+        properties = request.json['properties']
+
+        if name:
+            device.name = name
+        if device_type:
+            device.device_type = device_type
+        if description:
+            device.description = description
+        if device_parent:
+            device.device_parent = device_parent
+        if properties:
+            propers = []
+            for proper in properties:
+                keys_list = list(proper.keys())
+                if "name" not in keys_list or "value" not in keys_list or "description" not in keys_list:
+                    error = {"Error":"The properties doesn't have the mandatory attributes."}
+                    return make_response(jsonify(error),400)
+                properti = Property(name=proper["name"],value=proper["value"],description=proper["description"])
+                propers.append(properti)
+        
+        db.session.add(device)
+        db.session.commit()
+
+        if len(propers)>0:
+            for new_proper in propers:
+                proper = Property.query.filter_by(device_id=device.id,name=new_proper.name).first()
+                if proper is not None:
+                    proper.value = new_proper.value
+                    proper.description = new_proper.description
+                    db.session.add(proper)
+                else:
+                    new_proper.device_id = device.id
+                    db.session.add(new_proper)
+            db.session.commit()
+        return jsonify(device.serialize)
+
+    else:
+        error = {"Error":"The device doesn't exist."}
+        return make_response(jsonify(error),400)
+    
+
+    
+#Delete device
+@bp.route('/devices/<tag>', methods=["DELETE"])
+def delete_device_api(tag):
+    device = Device.query.filter_by(tag=tag).first()
+    try:
+        dirc= 'device_data/'+device.tag+'/'
+        #Delete the database register
+        properties = Property.query.filter_by(device_id=device.id)
+        for proper in properties:
+            db.session.delete(proper)
+        db.session.delete(device)
+        db.session.commit()
+        #Delete the folder and NOSQL database for the device.
+        if os.path.isdir(dirc):
+            shutil.rmtree(dirc)
+        return make_response(jsonify({"Delete":"The device was remove"}),200)
+
+    except Exception as e:
+        error = {"Error":"It's not possible to delete the device"}
+        return make_response(jsonify(error),400)
+
+
+
+
+
+
 @bp.route('/get_data', methods=('GET', 'POST'))
 #@login_required
 def get_data():
@@ -213,6 +358,6 @@ def get_data():
         data = table.all()
     else:
         data = {}
-    return jsonify(data)
+    return Response( json.dumps(data) ,mimetype="application/json", status=200)
 
 
