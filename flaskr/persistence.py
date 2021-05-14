@@ -32,12 +32,11 @@ class Persistence():
             device = Device.query.filter_by(tag=device_tag).first()
             if topic is None:
                 topic = Topic(topic=device_topic,active_devices=1)
-                device.topics.append(topic)
             else:
-                add = False
+                add = True
                 for top_dev in device.topics:
                     if top_dev.topic == topic.topic:
-                        add = True
+                        add = False
                 if add:
                     topic.active_devices += 1
                 topic.last_update = datetime.utcnow()
@@ -71,7 +70,6 @@ class Persistence():
     @staticmethod
     def delete_device_topic(device,topic):
         try:
-            print(topic.topic)
             db_t = TinyDB('device_data/'+device.tag+"/"+device.tag+".json")
             table = db_t.table(topic.topic)
             table.truncate()
