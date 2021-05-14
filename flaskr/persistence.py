@@ -4,7 +4,7 @@ from models import User,Device,Topic
 from app import db
 
 import json
-from datetime import date
+from datetime import datetime
 
 
 class Persistence():
@@ -29,12 +29,19 @@ class Persistence():
             values["time"] = msg["time"]
             table.insert(values)
             topic = Topic.query.filter_by(topic=device_topic).first()
+            device = Device.query.filter_by(tag=device_tag).first()
             if topic is None:
                 topic = Topic(topic=device_topic,active_devices=1)
+                device.topics.append(topic)
             else:
-                topic.active_devices += 1
-                topic.last_update = date.today()
-            device = Device.query.filter_by(tag=device_tag).first()
+                add = False
+                for top_dev in device.topics:
+                    if top_dev.topic == topic.topic:
+                        add = True
+                if add:
+                    topic.active_devices += 1
+                topic.last_update = datetime.utcnow()
+            
             device.topics.append(topic)            
             db.session.add(device)
             db.session.commit()
