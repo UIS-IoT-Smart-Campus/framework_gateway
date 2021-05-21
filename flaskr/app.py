@@ -5,6 +5,8 @@ from flask_mqtt import Mqtt
 #from flaskr.models.models import DeviceModel
 from flask_sqlalchemy import SQLAlchemy
 import json
+from flask_migrate import Migrate
+
 
 
 #Initial configuration
@@ -28,6 +30,10 @@ app.config.from_mapping(
 
 #Create Database
 db = SQLAlchemy(app)
+#database Migration
+migrate = Migrate()
+migrate.init_app(app,db)
+
 
 if test_config is None:
     #Load the instance config, if it exists, when not testing

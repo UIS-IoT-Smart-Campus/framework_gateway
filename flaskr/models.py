@@ -21,10 +21,11 @@ class User(db.Model):
 class Device(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tag = db.Column(db.String(80), unique=True, nullable=False)
-    name = db.Column(db.String(80), nullable=False)
-    device_type = db.Column(db.String(80), nullable=False)
-    description = db.Column(db.String(200), nullable=False)
+    name = db.Column(db.String(80), nullable=False)    
+    description = db.Column(db.String(200))
     topics = db.relationship('Topic',secondary=device_topics, lazy='subquery',backref=db.backref('device',lazy=True))
+    is_gateway = db.Column(db.Boolean,default=False)
+    ipv4_address = db.Column(db.String(20))
     device_parent = db.Column(db.Integer, db.ForeignKey('device.id'))
 
     @property
@@ -34,7 +35,6 @@ class Device(db.Model):
            'id': self.id,
            'tag': self.tag,
            'name': self.name,
-           'type': self.device_type,
            'description': self.description,
            'device_parent': self.device_parent,
            'topics': self.serializable_topics,
@@ -70,12 +70,22 @@ class Topic(db.Model):
             'active_devices': self.active_devices
         }
 
+class Resource(db.Model):
+    id =  db.Column(db.Integer, primary_key=True)    
+    tag = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(80), nullable=False)
+    description = db.Column(db.String(200))
+    resource_type = db.Column(db.String(80), nullable=False)
+    device_id = db.Column(db.Integer, db.ForeignKey('device.id'))
+
+
 class Property(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     value = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(200))
-    device_id = db.Column(db.Integer, db.ForeignKey('device.id'),nullable=False)
+    device_id = db.Column(db.Integer, db.ForeignKey('device.id'))
+    resource_id = db.Column(db.Integer, db.ForeignKey('resource.id'))
 
     @property
     def serializable(self):
@@ -84,7 +94,5 @@ class Property(db.Model):
             'value': self.value,
             'description': self.description
         }
-
-
 
 
