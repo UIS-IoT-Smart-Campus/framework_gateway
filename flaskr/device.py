@@ -216,6 +216,14 @@ def delete_property(id):
     return render_template('device/delete_property.html',property=property_d)
 
 
+#Resource View
+@bp.route('resource/<int:id>/view', methods=['GET'])
+@login_required
+def resource_view(id):
+    """ Resource View Section"""
+    resource = Resource.query.filter_by(id=id).first()
+    properties = Property.query.filter_by(resource_id=id)
+    return render_template('device/resource_detail.html', resource=resource,properties=properties)
 
 
 #Create Resource
@@ -257,8 +265,60 @@ def create_resource(id):
     return render_template('device/create_resource.html',device=device)
 
 
-#Delete Resource
+#Edith Resource
+@bp.route('/edit_resource/<int:id>', methods=('GET', 'POST'))
+@login_required
+def edit_resource(id):
+    resource = Resource.query.filter_by(id=id).first()
+    if resource is not None:
 
+        """View for create devices"""
+        if request.method == 'POST':
+
+            r_name = request.form['name']
+            r_description = request.form['description']
+            r_type = request.form['type']
+            
+            
+            try:
+                resource.name = r_name
+                resource.description = r_description
+                resource.resource_type = r_type
+                db.session.add(resource)
+                db.session.commit()
+
+                return redirect(url_for('device.resource_view',id = resource.id))
+
+            except Exception as e:
+                print(e)
+                flash("DB Update Failed")
+    else:
+        flash("Resource Not Found")
+
+    return render_template('device/edit_resource.html',resource=resource)
+
+
+#Delete Resource
+@bp.route('/delete_resource/<int:id>', methods=['GET','POST'])
+@login_required
+def delete_resource(id):
+    resource_d = Resource.query.filter_by(id=id).first()
+    if resource_d is not None:
+        if request.method == 'POST':
+            device_id = resource_d.device_id
+            try:
+                #Delete the database register
+                db.session.delete(resource_d)
+                db.session.commit()
+                flash("The resource was removed")
+                return redirect(url_for('device.device_view',id=device_id))
+
+            except Exception as e:
+                flash("DB Deleted Failed - %s".format(e))
+    else:
+        flash("Resource Not Found")
+
+    return render_template('device/delete_resource.html',resource=resource_d)
 
 """------------------------------------------------------------------
 Rest API Methods

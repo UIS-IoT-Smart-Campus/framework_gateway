@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Delete Resource{% endblock %}
+
+{% block menu %}
+<ul class="nav nav-pills flex-column mb-auto">
+  <li class="nav-item">
+    <a href="{{ url_for('index.index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+      Home
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('dashboard.index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+      Dashboard
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+      Devices
+    </a>
+  </li>  
+  <li>
+    <a href="{{ url_for('topic.topic_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+      Topics
+    </a>
+  </li>
+  <!--
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+      Users
+    </a>
+  </li>
+  -->
+</ul>
+{% endblock %}
+
+{% block content %}
+<div>
+  <h1>Delete Resource</h1>
+  <h4>¿Are you sure to remove the resource with name: {{ resource.name }}?</h4><br>
+  <p><b>Warning:</b>The delete action is irreversible, All properties of the resource will be deleted.</p>
+  <form method="post">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm ">
+          <input type="submit" class="btn btn-danger" value="Delete Resource">
+          <a class="btn btn-warning" href="{{ url_for('device.resource_view', id=resource.id ) }}" role="button"> Cancel</a>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

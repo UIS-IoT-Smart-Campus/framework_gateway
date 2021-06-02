@@ -135,7 +135,6 @@
                       <tr>
                         <th scope="col">TAG</th>
                         <th scope="col">Name</th>
-                        <th scope="col">Type</th>
                         <th scope="col">Details</th>
                       </tr>
                     </thead>
@@ -144,7 +143,6 @@
                       <tr>
                         <td>{{ off_device.tag }}</td>
                         <td>{{ off_device.name}}</td>
-                        <td>{{ off_device.device_type }}</td>
                         <td><a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=off_device['id']) }}" role="button">details</a></td>
                       </tr>
                       {% endfor %}
@@ -174,7 +172,7 @@
                     <td>{{ resource['tag'] }}</td>
                     <td>{{ resource['name'] }}</td>
                     <td>{{ resource['resource_type'] }}</td>
-                    <td><a class="btn btn-danger btn-sm" href="{{ url_for('device.delete_property', id=resource['id'] ) }}" role="button">Delete</a></td>
+                    <td><a class="btn btn-primary btn-sm" href="{{ url_for('device.resource_view', id=resource['id'] ) }}" role="button">Details</a></td>
                   </tr>
                   {% endfor %}
                 </tbody>
