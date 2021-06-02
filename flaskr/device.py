@@ -1,3 +1,4 @@
+import re
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
@@ -6,7 +7,7 @@ from flask import (
 from werkzeug.exceptions import abort
 
 from auth import login_required
-from models import Device,Property
+from models import Device,Property,Resource
 
 from flask import request,Response,make_response
 from flask import jsonify
@@ -35,26 +36,31 @@ def device_view(id):
     """ Devices View Section"""
     device = Device.query.filter_by(id=id).first()
     properties = Property.query.filter_by(device_id=id)
+    resources = Resource.query.filter_by(device_id=id)
     offspring_devices = Device.query.filter_by(device_parent=device.id)
-    return render_template('device/device_detail.html', device=device,properties=properties,offspring_devices=offspring_devices)
+    return render_template('device/device_detail.html', device=device,properties=properties,resources=resources,offspring_devices=offspring_devices)
 
 
 #Create Device
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
-    devices = db.session.query(Device).filter(Device.device_type.in_(('COMPOUND','COMPOUND SENSOR','COMPOUND ACTUATOR')))
+    devices = db.session.query(Device).all()
     """View for create devices"""
     if request.method == 'POST':
 
         tag = request.form['tag']
         name = request.form['name']
-        device_type = request.form['device_type']
+        is_gateway = request.form.get('is_gateway',False)
         description = request.form['description']
+        ip = request.form['ip']
         device_parent = request.form['device_parent']
         error = None
 
-        if not tag or not name or not device_type:
+        if is_gateway:
+            is_gateway = True
+
+        if not tag or not name:
             error = 'No mandatory property is set.'
         else:
             device = Device.query.filter_by(tag=tag).first()
@@ -69,9 +75,9 @@ def create():
                 if not os.path.exists(directory):
                     os.makedirs(directory)
                 if device_parent != "null":
-                    device = Device(tag=tag, name=name, device_type=device_type, description=description, device_parent=device_parent)
+                    device = Device(tag=tag, name=name, description=description,is_gateway=is_gateway, ipv4_address=ip, device_parent=device_parent)
                 else:
-                    device = Device(tag=tag, name=name, device_type=device_type, description=description)
+                    device = Device(tag=tag, name=name, is_gateway=is_gateway, ipv4_address=ip, description=description)
                 db.session.add(device)
                 db.session.commit()
                 return redirect(url_for('device.device_index'))
@@ -95,13 +101,20 @@ def edit_device(id):
         if request.method == 'POST':
 
             name = request.form['name']
-            device_type = request.form['device_type']
+            is_gateway = request.form.get('is_gateway',False)
             description = request.form['description']
+            ip = request.form['ip']
+
+            
+            if is_gateway:
+                is_gateway = True
+
             
             try:
                 device.name = name
-                device.device_type = device_type
+                device.is_gateway = is_gateway
                 device.description = description
+                device.ipv4_address = ip
                 db.session.add(device)
                 db.session.commit()
 
@@ -173,7 +186,7 @@ def create_property(id):
                 return redirect(url_for('device.device_view',id=device.id))
 
             except OSError as e:
-                flash("Creation of the directory %s failed" % tag)
+                flash("Creation of the directory %s failed" % e)
             except Exception as e:
                 flash("DB Creation Failed")
 
@@ -201,6 +214,51 @@ def delete_property(id):
         flash("Device Not Found")
 
     return render_template('device/delete_property.html',property=property_d)
+
+
+
+
+#Create Resource
+@bp.route('/add_resource/<int:id>', methods=('GET', 'POST'))
+@login_required
+def create_resource(id):
+    device = Device.query.filter_by(id=id).first()
+    """View for create resources"""
+    if request.method == 'POST':
+
+        r_tag = request.form['tag']
+        r_name = request.form['name']
+        r_type = request.form['type']
+        r_description = request.form['description']
+        device_id = device.id
+        error = None
+
+        if not r_tag or not r_name or not r_type:
+            error = 'No mandatory property is set.'
+        
+        resource = Resource.query.filter_by(tag=r_tag).first()
+        if resource is not None:
+            error = 'The Tag is already exist'
+
+        if error is not None:
+            flash(error)
+        else:            
+            try:
+                resource_d = Resource(tag=r_tag, name=r_name, description=r_description, resource_type=r_type,device_id=device_id)
+                db.session.add(resource_d)
+                db.session.commit()
+                return redirect(url_for('device.device_view',id=device.id))
+
+            except OSError as e:
+                flash("Creation of the directory %s failed" % e)
+            except Exception as e:
+                flash("DB Creation Failed")
+
+    return render_template('device/create_resource.html',device=device)
+
+
+#Delete Resource
+
 
 """------------------------------------------------------------------
 Rest API Methods

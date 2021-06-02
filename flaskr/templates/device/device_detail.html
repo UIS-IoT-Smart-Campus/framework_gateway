@@ -61,11 +61,12 @@
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="properties-tab" data-bs-toggle="tab" data-bs-target="#properties" type="button" role="tab" aria-controls="properties" aria-selected="false">Properties</button>
       </li>
-      {% if device.device_parent == None %}
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="subdevices-tab" data-bs-toggle="tab" data-bs-target="#subdevices" type="button" role="tab" aria-controls="subdevices" aria-selected="false">Sub-Devices</button>
+        <button class="nav-link" id="subdevices-tab" data-bs-toggle="tab" data-bs-target="#subdevices" type="button" role="tab" aria-controls="subdevices" aria-selected="false">Devices</button>
       </li>
-      {% endif %}
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="resources-tab" data-bs-toggle="tab" data-bs-target="#resources" type="button" role="tab" aria-controls="resources" aria-selected="false">Resources</button>
+      </li>
     </ul>
     <div class="tab-content" id="myTabContent">
       <div class="tab-pane fade show active" id="sumary" role="tabpanel" aria-labelledby="sumary-tab">
@@ -82,12 +83,16 @@
                 <td>{{ device.name }}</td>
               </tr>
               <tr>
-                <td><b>Device Type:</b></td>
-                <td>{{ device.device_type }}</td>
+                <td><b>Device Ipv4 Address:</b></td>
+                <td>{{ device.ipv4_address }}</td>
               </tr>
               <tr>
                 <td><b>Description:</b></td>
                 <td>{{ device.description }}</td>
+              </tr>
+              <tr>
+                <td><b>Is Gateway:</b></td>
+                <td>{% if device.is_gateway%}YES{%else%}NO{% endif %}</td>
               </tr>
             </tbody>
           </table>
@@ -120,7 +125,6 @@
                   </table>      
             </div>
       </div>
-      {% if device.device_parent == None %}
       <div class="tab-pane fade" id="subdevices" role="tabpanel" aria-labelledby="subdevices-tab">
         </br>
         <div class="row">
@@ -149,7 +153,33 @@
             </div>
         </div>
       </div>
-      {% endif %}
+      <div class="tab-pane fade" id="resources" role="tabpanel" aria-labelledby="resources-tab">
+      </br>
+      <div class="row">
+          <div class="col-sm">
+              <h5>Resources</h5>
+              <a class="btn btn-success btn-sm" href="{{ url_for('device.create_resource', id=device['id']) }}" role="button">Add</a>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Tag</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for resource in resources %}
+                  <tr>
+                    <td>{{ resource['tag'] }}</td>
+                    <td>{{ resource['name'] }}</td>
+                    <td>{{ resource['resource_type'] }}</td>
+                    <td><a class="btn btn-danger btn-sm" href="{{ url_for('device.delete_property', id=resource['id'] ) }}" role="button">Delete</a></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+          </div>
+      </div>
     </div>
 </div>
 {% endblock %}

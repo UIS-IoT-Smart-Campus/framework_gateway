@@ -56,14 +56,8 @@
           <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>
         </div>
         <div class="col-sm form-group">
-          <label for="device_type" >Device Type:</label>
-          <select name="device_type" id="device_type" class="form-control form-control-s" required>
-            <option value="COMPOUND">Compound</option>
-            <option value="COMPOUND SENSOR">Compound Sensor</option>
-            <option value="COMPOUND ACTUATOR">Compound Actuator</option>
-            <option value="SENSOR">Sensor</option>
-            <option value="ACTUATOR">Actuator</option>
-          </select>
+          <label for="is_gateway">Is a Gateway</label><br>
+          <input name="is_gateway" id="is_gateway" class="form-check-input" type="checkbox" {% if 'on' == request.form['is_gateway'] %}checked{% endif %}>
         </div>
       </div>
     </br>
@@ -71,6 +65,10 @@
         <div class="col-sm ">
           <label for="description">Device Description</label>
           <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
+        </div>
+        <div class="col-sm ">
+          <label for="ip">Ipv4 Address</label>
+          <input name="ip" id="ip" class="form-control">{{ request.form['ip'] }}</input>
         </div>
       </div>
     </br>
