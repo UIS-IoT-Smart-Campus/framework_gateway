@@ -67,7 +67,12 @@
       <div class="row">
         <div class="col-sm ">
           <input type="submit" class="btn btn-success" value="Create Property">
+          {% if device %}
           <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device['id']) }}" role="button"> Cancel</a>
+          {% endif %}
+          {% if resource %}
+          <a class="btn btn-danger" href="{{ url_for('device.resource_view', id=resource['id']) }}" role="button"> Cancel</a>
+          {% endif %}
         </div>
       </div>
     </div>

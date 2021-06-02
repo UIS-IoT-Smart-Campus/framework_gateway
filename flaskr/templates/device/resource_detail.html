@@ -86,7 +86,7 @@
           <br>
           <div class="col-sm">
                 <h5>Resource Properties</h5>
-                <a class="btn btn-success btn-sm" href="" role="button">Add</a>                
+                <a class="btn btn-success btn-sm" href="{{ url_for('device.create_property_resource', id=resource['id']) }}" role="button">Add</a>                
                 <table class="table">
                     <thead>
                       <tr>
@@ -102,7 +102,7 @@
                         <td>{{ property['name'] }}</td>
                         <td>{{ property['value'] }}</td>
                         <td>{{ property['description'] }}</td>
-                        <td><a class="btn btn-danger btn-sm" href="{{ url_for('device.delete_property', id=property['id'] ) }}" role="button">Delete</a></td>
+                        <td><a class="btn btn-danger btn-sm" href="{{ url_for('device.delete_property_resource', id=property['id'] ) }}" role="button">Delete</a></td>
                       </tr>
                       {% endfor %}
                     </tbody>

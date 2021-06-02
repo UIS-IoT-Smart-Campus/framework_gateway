@@ -37,8 +37,11 @@ class Device(db.Model):
            'name': self.name,
            'description': self.description,
            'device_parent': self.device_parent,
+           'ipv4_address': self.ipv4_address,
+           'is_gateway':self.is_gateway,
            'topics': self.serializable_topics,
-           'properties': self.serializable_properties
+           'properties': self.serializable_properties,
+           'resources':self.serializable_resources
        }
     
     @property
@@ -55,6 +58,14 @@ class Device(db.Model):
         """
         properties = Property.query.filter_by(device_id=self.id)
         return [properti.serializable for properti in properties]
+    
+    @property
+    def serializable_resources(self):
+        """
+        Return the resources of the device.
+        """
+        resources = Resource.query.filter_by(device_id=self.id)
+        return [resource.serializable for resource in resources]
 
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -77,6 +88,15 @@ class Resource(db.Model):
     description = db.Column(db.String(200))
     resource_type = db.Column(db.String(80), nullable=False)
     device_id = db.Column(db.Integer, db.ForeignKey('device.id'))
+
+    @property
+    def serializable(self):
+        return {
+            'tag': self.tag,
+            'name': self.name,
+            'description': self.description,
+            'type': self.resource_type
+        }
 
 
 class Property(db.Model):

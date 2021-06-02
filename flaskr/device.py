@@ -21,6 +21,33 @@ import shutil
 bp = Blueprint('device', __name__, url_prefix='/device')
 
 
+
+#Delete Resource
+def delete_resource_method(resource):
+    properties = Property.query.filter_by(resource_id=resource.id)
+    for property in properties:
+        db.session.delete(property)
+    db.session.delete(resource)
+    db.session.commit()
+
+
+#Delete Device
+def delete_device_method(device):
+    devices = Device.query.filter_by(device_parent=device.id)
+    for device_s in devices:
+        delete_device_method(device_s)    
+    resources = Resource.query.filter_by(device_id=device.id)
+    for resource in resources:
+        delete_resource_method(resource)
+    properties = Property.query.filter_by(device_id=device.id)
+    for property in properties:
+        db.session.delete(property)
+    dirc= 'device_data/'+device.tag+'/'
+    db.session.delete(device)
+    db.session.commit()
+    if os.path.isdir(dirc):
+        shutil.rmtree(dirc)
+
 #Index
 @bp.route('/')
 @login_required
@@ -136,17 +163,8 @@ def delete_device(id):
     device = Device.query.filter_by(id=id).first()
     if device is not None:
         if request.method == 'POST':
-            try:
-                dirc= 'device_data/'+device.tag+'/'
-                #Delete the database register
-                properties = Property.query.filter_by(device_id=device.id)
-                for proper in properties:
-                    db.session.delete(proper)
-                db.session.delete(device)
-                db.session.commit()
-                #Delete the folder and NOSQL database for the device.
-                if os.path.isdir(dirc):
-                    shutil.rmtree(dirc)
+            try:                
+                delete_device_method(device)                
                 flash("The device was removed")
                 return redirect(url_for('device.device_index'))
 
@@ -159,7 +177,7 @@ def delete_device(id):
 
 
 
-#Create Property
+#Create Property Device
 @bp.route('/add_property/<int:id>', methods=('GET', 'POST'))
 @login_required
 def create_property(id):
@@ -193,6 +211,40 @@ def create_property(id):
     return render_template('device/create_property.html',device=device)
 
 
+#Create Property Resource
+@bp.route('/add_property_resource/<int:id>', methods=('GET', 'POST'))
+@login_required
+def create_property_resource(id):
+    resource = Resource.query.filter_by(id=id).first()
+    """View for create properties"""
+    if request.method == 'POST':
+
+        p_name = request.form['name']
+        p_value = request.form['value']
+        p_description = request.form['description']
+        resource_id = resource.id
+        error = None
+
+        if not p_name or not p_value:
+            error = 'No mandatory property is set.'
+
+        if error is not None:
+            flash(error)
+        else:            
+            try:
+                property_d = Property(name=p_name, value=p_value, description=p_description, resource_id=resource_id)
+                db.session.add(property_d)
+                db.session.commit()
+                return redirect(url_for('device.resource_view',id=resource.id))
+
+            except OSError as e:
+                flash("Creation of the directory %s failed" % e)
+            except Exception as e:
+                flash("DB Creation Failed")
+
+    return render_template('device/create_property.html',resource=resource)
+
+
 #Delete Property
 @bp.route('/delete_property/<int:id>', methods=['GET','POST'])
 @login_required
@@ -207,6 +259,28 @@ def delete_property(id):
                 db.session.commit()
                 flash("The property was removed")
                 return redirect(url_for('device.device_view',id=device_id))
+
+            except Exception as e:
+                flash("DB Deleted Failed - %s".format(e))
+    else:
+        flash("Device Not Found")
+
+    return render_template('device/delete_property.html',property=property_d)
+
+#Delete Property
+@bp.route('/delete_property_resource/<int:id>', methods=['GET','POST'])
+@login_required
+def delete_property_resource(id):
+    property_d = Property.query.filter_by(id=id).first()
+    if property_d is not None:
+        if request.method == 'POST':
+            resource_id = property_d.resource_id
+            try:
+                #Delete the database register
+                db.session.delete(property_d)
+                db.session.commit()
+                flash("The property was removed")
+                return redirect(url_for('device.resource_view',id=resource_id))
 
             except Exception as e:
                 flash("DB Deleted Failed - %s".format(e))
@@ -327,33 +401,34 @@ Rest API Methods
 #Devices Rest API
 
 #Get all devices
-@bp.route('/devices', methods=["GET"])
+@bp.route('/api/', methods=["GET"])
 def get_devices_api():
     return jsonify(devices=[i.serialize for i in Device.query.all()])
 
 #Get a single device
-@bp.route('/devices/<tag>', methods=["GET"])
+@bp.route('/api/<tag>/', methods=["GET"])
 def get_device_api(tag):
     device = Device.query.filter_by(tag=tag).first()
     return jsonify(device.serialize)
 
 #Create a Device
-@bp.route('/devices', methods=["POST"])
+@bp.route('/api/', methods=["POST"])
 def add_device_api():
     body = request.get_json()
-    tag = body['tag']
-    name = body['name']
-    device_type = body['device_type']
-    description = body['description']
-    device_parent = body['device_parent']
-    properties = body['properties']
-
-    error = None
-
-    if not tag or not name or not device_type:
+    if 'tag' not in body or 'name' not in body:
         error = {"Error":"No mandatory property is set."}
         return make_response(jsonify(error),400)
     else:
+        tag = body['tag']
+        name = body['name']
+    
+        description = body.get('description',None)
+        device_parent = body.get('device_parent',None)
+        is_gateway = body.get('is_gateway',None)
+        ipv4_address = body.get('ipv4_address',None)
+        properties = body.get('properties',None)
+        resources = body.get('resources',None)
+        
         devices = Device.query.filter_by(tag=tag).first()
         if devices is not None:
             error = {"Error":"The device with this tag is already exist."}
@@ -367,54 +442,88 @@ def add_device_api():
         if properties:
             for proper in properties:
                 keys_list = list(proper.keys())
-                if "name" not in keys_list or "value" not in keys_list or "description" not in keys_list:
+                if "name" not in keys_list or "value" not in keys_list:
                     error = {"Error":"The properties doesn't have the mandatory attributes."}
                     return make_response(jsonify(error),400)
+        
+        if resources:
+            for resource in resources:
+                keys_list = list(resource.keys())
+                if "tag" not in keys_list or "name" not in keys_list or "resource_type" not in keys_list:
+                    error = {"Error":"The resources doesn't have the mandatory attributes."}
+                    return make_response(jsonify(error),400)
 
-        device = Device(tag=tag,name=name,device_type=device_type,description=description,device_parent=device_parent)
+        device = Device(tag=tag,name=name,description=description,ipv4_address=ipv4_address,is_gateway=is_gateway,device_parent=device_parent)
         db.session.add(device)
         db.session.commit()
 
         if properties:
             for proper in properties:
-                proper = Property(name=proper["name"],value=proper["value"],description=proper["description"],device_id=device.id)
-                db.session.add(proper)
+                if "description" not in list(proper.keys()):
+                    proper_d = Property(name=proper["name"],value=proper["value"],device_id=device.id)
+                else:
+                    proper_d = Property(name=proper["name"],value=proper["value"],description=proper["description"],device_id=device.id)
+                db.session.add(proper_d)
         
+        if resources:
+            for resource in resources:
+                if "description" not in list(resource.keys()):
+                    resource_d = Resource(tag=resource["tag"],name=resource["name"],resource_type=resource["resource_type"],device_id=device.id)
+                else:
+                    resource_d = Resource(tag=resource["tag"],name=resource["name"],description=resource["description"],resource_type=resource["resource_type"],device_id=device.id)
+                db.session.add(resource_d)
         
         db.session.commit()        
         return jsonify(device.serialize)
 
-    return jsonify(devices=[i.serialize for i in Device.query.all()])
-
 #Update device
-@bp.route('/devices/<tag>', methods=["PUT"])
+@bp.route('/api/<tag>/', methods=["PUT"])
 def update_device_api(tag):
     device = Device.query.filter_by(tag=tag).first()
     
     if device is not None:
-        name = request.json['name']
-        device_type = request.json['device_type']
-        description = request.json['description']
-        device_parent = request.json['device_parent']
-        properties = request.json['properties']
+        body = request.get_json()
+        propers = []
+        resources_list = []
+        
+        #Get properties from request
+        name = body.get('name',None)
+        description = body.get('description',None)
+        device_parent = body.get('device_parent',None)
+        is_gateway = body.get('is_gateway',None)
+        ipv4_address = body.get('ipv4_address',None)
+        properties = body.get('properties',None)
+        resources = body.get('resources',None)
 
+
+        #Set properties to model
         if name:
             device.name = name
-        if device_type:
-            device.device_type = device_type
         if description:
             device.description = description
         if device_parent:
             device.device_parent = device_parent
-        if properties:
-            propers = []
+        if is_gateway is not None:
+            device.is_gateway = is_gateway
+        if ipv4_address:
+            device.ipv4_address = ipv4_address
+        if properties:            
             for proper in properties:
                 keys_list = list(proper.keys())
-                if "name" not in keys_list or "value" not in keys_list or "description" not in keys_list:
+                if "name" not in keys_list or "value" not in keys_list:
                     error = {"Error":"The properties doesn't have the mandatory attributes."}
                     return make_response(jsonify(error),400)
-                properti = Property(name=proper["name"],value=proper["value"],description=proper["description"])
+                properti = Property(name=proper["name"],value=proper["value"],description=proper.get("description",None))
                 propers.append(properti)
+        if resources:
+            for resource in resources:
+                keys_list = list(resource.keys())
+                if "tag" not in keys_list or "name" not in keys_list or "resource_type" not in keys_list:
+                    error = {"Error":"The resources doesn't have the mandatory attributes."}
+                    return make_response(jsonify(error),400)
+                resource_i = Resource(tag=resource["tag"],name=resource.get("name",None),resource_type=resource.get("resource_type",None))
+                resources_list.append(resource_i)
+
         
         db.session.add(device)
         db.session.commit()
@@ -430,6 +539,24 @@ def update_device_api(tag):
                     new_proper.device_id = device.id
                     db.session.add(new_proper)
             db.session.commit()
+        
+
+        if len(resources_list)>0:
+            for new_resource in resources_list:
+                resource = Resource.query.filter_by(device_id=device.id,tag=new_resource.tag).first()                
+                if resource is not None:
+                    print("entro aquí")
+                    resource.name = new_resource.name
+                    resource.resource_type = new_resource.resource_type
+                    if new_resource.description:
+                        resource.description = new_resource.description
+                    db.session.add(resource)
+                else:
+                    print("entro aca")
+                    new_resource.device_id = device.id
+                    db.session.add(new_resource)
+            db.session.commit()
+
         return jsonify(device.serialize)
 
     else:
@@ -439,28 +566,16 @@ def update_device_api(tag):
 
     
 #Delete device
-@bp.route('/devices/<tag>', methods=["DELETE"])
+@bp.route('/api/<tag>/', methods=["DELETE"])
 def delete_device_api(tag):
     device = Device.query.filter_by(tag=tag).first()
     try:
-        dirc= 'device_data/'+device.tag+'/'
-        #Delete the database register
-        properties = Property.query.filter_by(device_id=device.id)
-        for proper in properties:
-            db.session.delete(proper)
-        db.session.delete(device)
-        db.session.commit()
-        #Delete the folder and NOSQL database for the device.
-        if os.path.isdir(dirc):
-            shutil.rmtree(dirc)
+        delete_device_method(device)
         return make_response(jsonify({"Delete":"The device was remove"}),200)
 
     except Exception as e:
         error = {"Error":"It's not possible to delete the device"}
         return make_response(jsonify(error),400)
-
-
-
 
 
 

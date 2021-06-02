@@ -50,7 +50,12 @@
       <div class="row">
         <div class="col-sm ">
           <input type="submit" class="btn btn-danger" value="Delete Property">
+          {% if resource %}
           <a class="btn btn-warning" href="{{ url_for('device.device_view', id=property.device_id ) }}" role="button"> Cancel</a>
+          {% endif %}
+          {% if resource %}
+          <a class="btn btn-warning" href="{{ url_for('device.resource_view', id=property.resource_id ) }}" role="button"> Cancel</a>
+          {% endif %}
         </div>
       </div>
     </div>
