@@ -29,3 +29,5 @@ Inside the folder flaskr run the following comand:
 flask run -h 0.0.0.0 -p 5000
 
 You can remplace the port in -p XXXX. 
+
+Note: You need an environment with the requirements.txt installed
