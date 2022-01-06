@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Device{% endblock %}
+
+{% block menu %}
+<ul class="nav nav-pills flex-column mb-auto">
+  <li class="nav-item">
+    <a href="{{ url_for('index.index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+      Home
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('dashboard.index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+      Dashboard
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+      Devices
+    </a>
+  </li>  
+  <li>
+    <a href="{{ url_for('topic.topic_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+      Topics
+    </a>
+  </li>
+  <!--
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+      Users
+    </a>
+  </li>
+  -->
+</ul>
+{% endblock %}
+
+{% block content %}
+<div>
+  <h1>Update Settings</h1>
+  <br>
+  <hr>
+  <p>To reset the property value, submit blank.</p>
+  <form method="post">
+    <div class="form-group">
+      <div class="row">
+        <div class="col">
+          <label for="standalone"><b>Stand-Alone</b></label>
+          <select class="form-select" id="standalone" name="standalone">
+            <option value="true" {% if settings['standalone'] %}selected{% endif %}>True</option>
+            <option value="false" {% if not settings['standalone'] %}selected{% endif %}>False</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="backendip"><b>Backend IP</b></label>
+          <input type="text" class="form-control" id="backendip" name="backendip" value="{{settings['backendIp']}}">
+        </div>
+        <div class="col">
+          <label for="backendport"><b>Backend Port</b></label>
+          <input type="text" class="form-control" id="backendport" name="backendport" value="{{settings['backendPort']}}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label for="brokerip"><b>Broker IP</b></label>
+          <input type="text" class="form-control" id="brokerip" name="brokerip" value="{{settings['brokerIp']}}">
+        </div>
+        <div class="col">
+          <label for="brokerport"><b>Broker Port</b></label>
+          <input type="text" class="form-control" id="brokerport" name="brokerport" value="{{settings['brokerPort']}}">
+        </div>
+        <div class="col">
+          <label for="backendtopic"><b>Backend Topic</b></label>
+          <input type="text" class="form-control" id="backendtopic" name="backendtopic" value="{{settings['backend_topic']}}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4">
+          <label for="mqttclientname"><b>MQTT Client Name</b></label>
+          <input type="text" class="form-control" id="mqttclientname" name="mqttclientname" value="{{settings['MqttClient']}}">
+        </div>
+      </div>     
+    </div>
+    <br>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <a class="btn btn-danger" href="{{ url_for('gateway.settings') }}">Cancel</a>
+  </form>
+</div>
+
+{% endblock %}

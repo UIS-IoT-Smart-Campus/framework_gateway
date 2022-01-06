@@ -97,6 +97,25 @@ class Resource(db.Model):
             'description': self.description,
             'type': self.resource_type
         }
+    
+    @property
+    def serialize(self):
+        return {
+            'tag': self.tag,
+            'name': self.name,
+            'description': self.description,
+            'type': self.resource_type,
+            'device_id':self.device_id,
+            'properties':self.serializable_properties
+        }
+    
+    @property
+    def serializable_properties(self):
+        """
+        Return the properties of the device.
+        """
+        properties = Property.query.filter_by(resource_id=self.id)
+        return [properti.serializable for properti in properties]
 
 
 class Property(db.Model):
@@ -114,5 +133,3 @@ class Property(db.Model):
             'value': self.value,
             'description': self.description
         }
-
-

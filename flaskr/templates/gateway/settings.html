@@ -43,7 +43,27 @@
 {% block content %}
 <div>
   <h1>Settings</h1>
-  <br><br>
+  <br>
+  <hr>
+  <a class="btn btn-sm btn-success" href="{{ url_for('gateway.settings_update') }}">Update Settings</a>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><b>Stand-Alone: </b>{{ settings['standalone'] }}</td>
+        <td><b>Backend IP: </b>{{ settings['backendIp'] }}</td>
+        <td><b>Backend Port: </b>{{ settings['backendPort'] }}</td>        
+      </tr>
+      <tr>
+        <td><b>Broker IP: </b>{{ settings['brokerIp'] }}</td>
+        <td><b>Broker Port: </b>{{ settings['brokerPort'] }}</td>
+        <td><b>Backend Topic: </b>{{ settings['backend_topic'] }}</td>
+      </tr>
+      <tr>
+        <td><b>Mqtt Client Name: </b>{{ settings['MqttClient'] }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
   <form action="{{ url_for('gateway.settings') }}" method="POST">
     <input class="btn-primary" type="submit" value="Reboot" onclick="alert('Reiniciando')">
   </form>

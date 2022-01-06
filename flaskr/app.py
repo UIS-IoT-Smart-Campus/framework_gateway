@@ -108,9 +108,9 @@ def handle_connect(client, userdata, flags, rc):
 def handle_mqtt_message(client, userdata, message):
     if message.topic == 'device/data':
         msg = MQTT_Converter(message.payload.decode("utf-8"))
-        if msg["device_tag"]:
+        if msg["tag"]:
             with app.app_context():
-                device = Device.query.filter_by(tag= msg["device_tag"]).first()
+                device = Device.query.filter_by(tag= msg["tag"]).first()
             if device is not None:
                 pst.insert_message(msg,device)
             else:

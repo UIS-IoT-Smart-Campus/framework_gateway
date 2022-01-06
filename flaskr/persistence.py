@@ -5,9 +5,14 @@ from app import db
 
 import json
 from datetime import datetime
+from paho.mqtt import client as mqtt_client
+import configparser
+
 
 
 class Persistence():
+
+    
 
     """
     Msg is a json format
@@ -16,22 +21,18 @@ class Persistence():
     values: Is the values for store
     """
     def insert_message(self,msg,device):        
-        if msg["device_tag"] and msg["keys"] and msg["values"] and msg["device_topic"]:
-            device_tag = str(msg["device_tag"])
-            device_topic = str(msg["device_topic"])
-            db_t = TinyDB('device_data/'+device.tag+"/"+device_tag+".json")
-            table = db_t.table(str(msg["device_topic"]))
-            values = {}
-            value = 0
-            for key in msg["keys"]:
-                values[key] = msg["values"][value]
-                value+=1
+        if msg["tag"] and msg["content"] and msg["topic"]:
+            tag = str(msg["tag"])
+            topic = str(msg["topic"])
+            db_t = TinyDB('device_data/'+device.tag+"/"+tag+".json")
+            table = db_t.table(topic)
+            values = msg["content"]
             values["time"] = msg["time"]
             table.insert(values)
-            topic = Topic.query.filter_by(topic=device_topic).first()
-            device = Device.query.filter_by(tag=device_tag).first()
+            topic = Topic.query.filter_by(topic=topic).first()
+            device = Device.query.filter_by(tag=tag).first()
             if topic is None:
-                topic = Topic(topic=device_topic,active_devices=1)
+                topic = Topic(topic=topic,active_devices=1)
             else:
                 add = True
                 for top_dev in device.topics:
@@ -45,7 +46,29 @@ class Persistence():
             db.session.add(device)
             db.session.commit()
 
-
+            config = configparser.ConfigParser()
+            config.readfp(open('init.cfg'))
+            standalone = config.getboolean('DEFAULT','standalone')
+            if standalone:
+                #Send message to MQTT broker
+                if msg["time"]:
+                    msg.pop("time",None)
+                msg_json = json.dumps(msg)
+                def on_connect(client, userdata, flags, rc):
+                    if rc == 0:
+                        pass
+                        #print("Connected to MQTT Broker!")
+                    else:
+                        pass
+                        #print("Failed to connect, return code %d\n", rc)
+                broker = config.get('DEFAULT','brokerIp')
+                port = config.get('DEFAULT','brokerPort')
+                backend_topic = config.get('DEFAULT','backend_topic')
+                MqttClient = config.get('DEFAULT','MqttClient')
+                client = mqtt_client.Client(MqttClient)
+                client.on_connect = on_connect
+                client.connect(broker, port)
+                client.publish(backend_topic, msg_json)
 
     
     def insert_gateway_record(self,msg):

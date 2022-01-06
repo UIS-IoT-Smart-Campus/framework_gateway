@@ -1,4 +1,3 @@
-#!/home/pi/Documents/framework/venv/bin/python
 import random
 import time
 import requests
@@ -8,24 +7,21 @@ import pytz
 from paho.mqtt import client as mqtt_client
 
 
-"""
-Parameters of publish code from python
-Source: https://www.emqx.io/blog/how-to-use-mqtt-in-python
-"""
 
 #Conection and broker parameters
-broker = 'localhost'
+broker = '192.168.0.125'
 port = 1883
-topic = "device/data"
-client_id = 'python-mqtt-A001'
-#Message Parameter
-tag = "A001"
-msg_topic = "temp_lebrija"
-content = {"temp":0,"feels_like":0,"pressure":0,"humidity":0}
-delay_time = 3600
+topic = "device/message"
+client_id = 'python-mqtt-test'
 
-# username = 'emqx'
-# password = 'public'
+#Message Parameter
+device_tag = "A001"
+keys = ["temp","feels_like","pressure","humidity"]
+values = [0,0,0,0]
+device_topic = "temp_lebrija"
+delay_time = 1
+
+
 
 """
 Function to create the message.
@@ -41,16 +37,17 @@ def get_message():
         feels_like = resp.json()["main"]["feels_like"]
         pressure = resp.json()["main"]["pressure"]
         humidity = resp.json()["main"]["humidity"]
-        content["temp"] = temp
-        content["feels_like"] = feels_like
-        content["pressure"] = pressure
-        content["humidity"] = humidity
+        values = []
+        values.append(temp)
+        values.append(feels_like)
+        values.append(pressure)
+        values.append(humidity)
     
     tz_Col = pytz.timezone('America/Bogota')
     now = datetime.now(tz_Col)
     current_time = now.strftime("%d-%m-%Y %H:%M:%S")
 
-    msg = {"tag":tag,"topic":msg_topic,"content":content,"time":current_time}
+    msg = {"tag":device_tag,"topic":device_topic,"keys":keys,"values":values,"time":current_time}
     msg_json = json.dumps(msg)
     return msg_json
     
@@ -78,7 +75,7 @@ Function to publish messages to MQTT broker
 """
 def publish(client):
     msg_count = 0
-    while True:
+    while msg_count<1:
         try:
             msg = get_message()
             result = client.publish(topic, msg)
