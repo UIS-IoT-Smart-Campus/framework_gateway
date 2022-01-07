@@ -43,67 +43,73 @@
 {% block content %}
 
 <div>
-  <h1>Topic</h1>
-    </br>
-    <div class="row">
-      <h3>Actions</h3>
-        <div class="col-sm">
-          <a class="btn btn-danger btn-sm" href="{{ url_for('topic.delete_topic', id=topic['id']) }}" role="button">Delete Topic</a>
-        </div>
-    </div><br>
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="sumary-tab" data-bs-toggle="tab" data-bs-target="#sumary" type="button" role="tab" aria-controls="sumary" aria-selected="true">Sumary</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="devices-tab" data-bs-toggle="tab" data-bs-target="#devices" type="button" role="tab" aria-controls="devices" aria-selected="false">Devices</button>
-      </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active" id="sumary" role="tabpanel" aria-labelledby="sumary-tab">
-        {% if topic %}
-        <table class="table">
-            <br>
-            <tbody>
-              <tr>
-                <td><b>Topic:</b></td>
-                <td>{{ topic.topic }}</td>
-              </tr>
-              <tr>
-                <td><b>Last Update:</b></td>
-                <td>{{ topic.last_update }}</td>
-              </tr>
-              <tr>
-                <td><b>Active Devices:</b></td>
-                <td>{{ topic.active_devices }}</td>
-              </tr>
-            </tbody>
-          </table>
-        {% endif %}
-      </div>
-      <div class="tab-pane fade" id="devices" role="tabpanel" aria-labelledby="devices-tab">
-          <br><br>
+  <nav class="navbar title-nav">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>Topics</span>
+    </div>
+  </nav>
+  <div class="page-content">
+      </br>
+      <div class="row">
+        <h3>Actions</h3>
           <div class="col-sm">
-                <h5>Devices</h5>                
-                <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">Device TAG</th>
-                        <th scope="col">Device Name</th>
-                        <th scope="col">Details</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for device in devices %}
-                      <tr>
-                        <td>{{ device.tag }}</td>
-                        <td>{{ device.name }}</td>
-                        <td><a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=device['id']) }}" role="button">Details</a></td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>      
-            </div>
+            <a class="btn btn-danger btn-sm" href="{{ url_for('topic.delete_topic', id=topic['id']) }}" role="button">Delete Topic</a>
+          </div>
+      </div><br>
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="sumary-tab" data-bs-toggle="tab" data-bs-target="#sumary" type="button" role="tab" aria-controls="sumary" aria-selected="true">Sumary</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="devices-tab" data-bs-toggle="tab" data-bs-target="#devices" type="button" role="tab" aria-controls="devices" aria-selected="false">Devices</button>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="sumary" role="tabpanel" aria-labelledby="sumary-tab">
+          {% if topic %}
+          <table class="table">
+              <br>
+              <tbody>
+                <tr>
+                  <td><b>Topic:</b></td>
+                  <td>{{ topic.topic }}</td>
+                </tr>
+                <tr>
+                  <td><b>Last Update:</b></td>
+                  <td>{{ topic.last_update }}</td>
+                </tr>
+                <tr>
+                  <td><b>Active Devices:</b></td>
+                  <td>{{ topic.active_devices }}</td>
+                </tr>
+              </tbody>
+            </table>
+          {% endif %}
+        </div>
+        <div class="tab-pane fade" id="devices" role="tabpanel" aria-labelledby="devices-tab">
+            <br><br>
+            <div class="col-sm">
+                  <h5>Devices</h5>                
+                  <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Device TAG</th>
+                          <th scope="col">Device Name</th>
+                          <th scope="col">Details</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for device in devices %}
+                        <tr>
+                          <td>{{ device.tag }}</td>
+                          <td>{{ device.name }}</td>
+                          <td><a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=device['id']) }}" role="button">Details</a></td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>      
+              </div>
+        </div>
       </div>
     </div>
 </div>

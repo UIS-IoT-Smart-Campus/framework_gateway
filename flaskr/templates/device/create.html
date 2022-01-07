@@ -42,56 +42,65 @@
 
 {% block content %}
 <div>
-  <h1>Devices</h1>
-  <p>Then you can create a new device.</p>
-  <form method="post">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm form-group">
-          <label for="tag">Device Tag</label>
-          <input name="tag" id="tag" class="form-control" value="{{ request.form['tag'] }}" required>
-        </div>
-        <div class="col-sm form-group">
-          <label for="name">Device Name</label>
-          <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>
-        </div>
-        <div class="col-sm form-group">
-          <label for="is_gateway">Is a Gateway</label><br>
-          <input name="is_gateway" id="is_gateway" class="form-check-input" type="checkbox" {% if 'on' == request.form['is_gateway'] %}checked{% endif %}>
-        </div>
-      </div>
-    </br>
-      <div class="row">
-        <div class="col-sm ">
-          <label for="description">Device Description</label>
-          <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
-        </div>
-        <div class="col-sm ">
-          <label for="ip">Ipv4 Address</label>
-          <input name="ip" id="ip" class="form-control">{{ request.form['ip'] }}</input>
-        </div>
-      </div>
-    </br>
-      <div class="row">
-        <div class="col-sm-4">
-          <label for="device_parent">Device Parent</label>
-          <select name="device_parent" id="device_parent" class="form-control form-control-s">
-            <option value="null">--------</option>
-            {% for device in devices %}
-            <option value="{{ device.id }}">{{ device.tag }} - {{ device.name }}</option>
-            {% endfor %}            
-          </select>
-        </div>
-      </div>
-    </br>
-      <div class="row">
-        <div class="col-sm ">
-          <input type="submit" class="btn btn-success" value="Create Device">
-          <a class="btn btn-danger" href="{{ url_for('device.device_index') }}" role="button"> Cancel</a>
-        </div>
-      </div>
+  <nav class="navbar title-nav">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Devices</span>
     </div>
-  </form>
+  </nav>
+  <div class="page-content">
+    <p>Then you can create a new device.</p>
+    <form method="post">
+      <div class="container">
+        <fieldset>
+          <legend>Create Device</legend>
+        <div class="row">
+          <div class="col-sm form-group">
+            <label for="tag">Device Tag</label>
+            <input name="tag" id="tag" class="form-control" value="{{ request.form['tag'] }}" required>
+          </div>
+          <div class="col-sm form-group">
+            <label for="name">Device Name</label>
+            <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>
+          </div>
+          <div class="col-sm form-group">
+            <label for="is_gateway">Is a Gateway</label><br>
+            <input name="is_gateway" id="is_gateway" class="form-check-input" type="checkbox" {% if 'on' == request.form['is_gateway'] %}checked{% endif %}>
+          </div>
+        </div>
+      </br>
+        <div class="row">
+          <div class="col-sm ">
+            <label for="description">Device Description</label>
+            <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
+          </div>
+          <div class="col-sm ">
+            <label for="ip">Ipv4 Address</label>
+            <input name="ip" id="ip" class="form-control">{{ request.form['ip'] }}</input>
+          </div>
+        </div>
+      </br>
+        <div class="row">
+          <div class="col-sm-4">
+            <label for="device_parent">Device Parent</label>
+            <select name="device_parent" id="device_parent" class="form-control form-control-s">
+              <option value="null">--------</option>
+              {% for device in devices %}
+              <option value="{{ device.id }}">{{ device.tag }} - {{ device.name }}</option>
+              {% endfor %}            
+            </select>
+          </div>
+        </div>
+      </br>
+        <div class="row">
+          <div class="col-sm ">
+            <input type="submit" class="btn btn-success" value="Create Device">
+            <a class="btn btn-danger" href="{{ url_for('device.device_index') }}" role="button"> Cancel</a>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+    </form>
+  </div>  
 </div>
 
 {% endblock %}

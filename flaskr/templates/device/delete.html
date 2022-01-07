@@ -42,19 +42,26 @@
 
 {% block content %}
 <div>
-  <h1>Delete Device</h1>
-  <h4>¿Are you sure to remove the device with tag: {{ device.tag }}?</h4><br>
-  <p><b>Warning:</b>This action delete the device properties, folder and data.</p>
-  <form method="post">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm ">
-          <input type="submit" class="btn btn-danger" value="Delete Device">
-          <a class="btn btn-warning" href="{{ url_for('device.device_view', id=device.id ) }}" role="button"> Cancel</a>
+  <nav class="navbar title-nav">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Devices</span>
+    </div>
+  </nav>
+  <div class="page-content">
+    <h1>Delete Device</h1>
+    <h4>¿Are you sure to remove the device with tag: {{ device.tag }}?</h4><br>
+    <p><b>Warning:</b>This action delete the device properties, folder and data.</p>
+    <form method="post">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm ">
+            <input type="submit" class="btn btn-danger" value="Delete Device">
+            <a class="btn btn-warning" href="{{ url_for('device.device_view', id=device.id ) }}" role="button"> Cancel</a>
+          </div>
         </div>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>  
 </div>
 
 {% endblock %}

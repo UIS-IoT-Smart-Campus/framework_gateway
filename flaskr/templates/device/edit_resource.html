@@ -44,43 +44,50 @@
 
 {% block content %}
 <div>
-  <h1>Resource</h1>
-  <p>Then you can edit the device general data.</p>  
-  <form method="post">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm form-group">
-            <label for="tag">Resource Tag</label>
-            <input name="tag" id="tag" class="form-control" value="{{ resource.tag }}" readonly required>
-          </div>
-        <div class="col-sm form-group">
-          <label for="name">Resource Name</label>
-          <input name="name" id="name" class="form-control" value="{{ resource.name }}" required>
-        </div>
-        <div class="col-sm form-group">
-          <label for="type">Resource Type</label>
-          <select class="form-select" id="type" name="type" aria-label="Default select example">
-            <option value="SENSOR" {% if resource.resource_type == 'SENSOR' %}selected{% endif %}>SENSOR</option>
-            <option value="ACTUATOR" {% if resource.resource_type == 'ACTUATOR' %}selected{% endif %}>ACTUATOR</option>
-          </select>
-        </div>        
-      </div>
-    </br>
-      <div class="row">
-        <div class="col-sm ">
-          <label for="description">Resource Description</label>
-          <textarea name="description" id="description" class="form-control">{{ resource.description }}</textarea>
-        </div>
-      </div>
-    </br>
-      <div class="row">
-        <div class="col-sm ">
-          <input type="submit" class="btn btn-success" value="Save">
-          <a class="btn btn-danger" href="{{ url_for('device.resource_view', id=resource.id) }}" role="button"> Cancel</a>
-        </div>
-      </div>
+  <nav class="navbar title-nav">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Devices</span>
     </div>
-  </form>
+  </nav>
+  <div class="page-content">
+    <h1>Resource</h1>
+    <p>Then you can edit the device general data.</p>  
+    <form method="post">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm form-group">
+              <label for="tag">Resource Tag</label>
+              <input name="tag" id="tag" class="form-control" value="{{ resource.tag }}" readonly required>
+            </div>
+          <div class="col-sm form-group">
+            <label for="name">Resource Name</label>
+            <input name="name" id="name" class="form-control" value="{{ resource.name }}" required>
+          </div>
+          <div class="col-sm form-group">
+            <label for="type">Resource Type</label>
+            <select class="form-select" id="type" name="type" aria-label="Default select example">
+              <option value="SENSOR" {% if resource.resource_type == 'SENSOR' %}selected{% endif %}>SENSOR</option>
+              <option value="ACTUATOR" {% if resource.resource_type == 'ACTUATOR' %}selected{% endif %}>ACTUATOR</option>
+            </select>
+          </div>        
+        </div>
+      </br>
+        <div class="row">
+          <div class="col-sm ">
+            <label for="description">Resource Description</label>
+            <textarea name="description" id="description" class="form-control">{{ resource.description }}</textarea>
+          </div>
+        </div>
+      </br>
+        <div class="row">
+          <div class="col-sm ">
+            <input type="submit" class="btn btn-success" value="Save">
+            <a class="btn btn-danger" href="{{ url_for('device.resource_view', id=resource.id) }}" role="button"> Cancel</a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>  
 </div>
 
 {% endblock %}

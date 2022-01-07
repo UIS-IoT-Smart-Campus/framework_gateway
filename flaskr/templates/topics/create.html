@@ -42,25 +42,32 @@
 
 {% block content %}
 <div>
-  <h1>Create Topic</h1>
-  <p>Then you can create a new topic.</p>
-  <form method="post">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm form-group">
-          <label for="topic">Topic</label>
-          <input name="topic" id="topic" class="form-control" value="{{ request.form['topic'] }}" size="50" required>
-        </div>
-      </div>
-      <br><br>
-      <div class="row">
-        <div class="col-sm ">
-          <input type="submit" class="btn btn-success" value="Create Topic">
-          <a class="btn btn-danger" href="{{ url_for('topic.topic_index') }}" role="button"> Cancel</a>
-        </div>
-      </div>
+  <nav class="navbar title-nav">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>Topics</span>
     </div>
-  </form>
+  </nav>
+  <div class="page-content">
+    <h1>Create Topic</h1>
+    <p>Then you can create a new topic.</p>
+    <form method="post">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm form-group">
+            <label for="topic">Topic</label>
+            <input name="topic" id="topic" class="form-control" value="{{ request.form['topic'] }}" size="50" required>
+          </div>
+        </div>
+        <br><br>
+        <div class="row">
+          <div class="col-sm ">
+            <input type="submit" class="btn btn-success" value="Create Topic">
+            <a class="btn btn-danger" href="{{ url_for('topic.topic_index') }}" role="button"> Cancel</a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endblock %}

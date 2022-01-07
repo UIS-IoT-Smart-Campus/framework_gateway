@@ -42,41 +42,48 @@
 
 {% block content %}
 <div>
-  <h1>Property</h1>
-  <p>Then you can create a new property.</p>
-  <form method="post">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm form-group">
-          <label for="name">Property Name</label>
-          <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>
-        </div>
-        <div class="col-sm form-group">
-          <label for="value">Property Value</label>
-          <input name="value" id="value" class="form-control" value="{{ request.form['value'] }}" required>
-        </div>        
-      </div>
-    </br>
-      <div class="row">
-        <div class="col-sm ">
-          <label for="description">Property Description</label>
-          <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
-        </div>
-      </div>
-    </br>
-      <div class="row">
-        <div class="col-sm ">
-          <input type="submit" class="btn btn-success" value="Create Property">
-          {% if device %}
-          <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device['id']) }}" role="button"> Cancel</a>
-          {% endif %}
-          {% if resource %}
-          <a class="btn btn-danger" href="{{ url_for('device.resource_view', id=resource['id']) }}" role="button"> Cancel</a>
-          {% endif %}
-        </div>
-      </div>
+  <nav class="navbar title-nav">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Devices</span>
     </div>
-  </form>
+  </nav>
+  <div class="page-content">
+    <h1>Property</h1>
+    <p>Then you can create a new property.</p>
+    <form method="post">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm form-group">
+            <label for="name">Property Name</label>
+            <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>
+          </div>
+          <div class="col-sm form-group">
+            <label for="value">Property Value</label>
+            <input name="value" id="value" class="form-control" value="{{ request.form['value'] }}" required>
+          </div>        
+        </div>
+      </br>
+        <div class="row">
+          <div class="col-sm ">
+            <label for="description">Property Description</label>
+            <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
+          </div>
+        </div>
+      </br>
+        <div class="row">
+          <div class="col-sm ">
+            <input type="submit" class="btn btn-success" value="Create Property">
+            {% if device %}
+            <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device['id']) }}" role="button"> Cancel</a>
+            {% endif %}
+            {% if resource %}
+            <a class="btn btn-danger" href="{{ url_for('device.resource_view', id=resource['id']) }}" role="button"> Cancel</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>  
 </div>
 
 {% endblock %}

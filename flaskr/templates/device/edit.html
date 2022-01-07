@@ -42,48 +42,54 @@
 
 {% block content %}
 <div>
-  <h1>Devices</h1>
-  <p>Then you can edit the device general data.</p>
-  {% if device %}
-  <form method="post">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm form-group">
-          <label for="tag">Device Tag</label>
-          <input name="tag" id="tag" class="form-control" value="{{device.tag }}" readonly required>
-        </div>
-        <div class="col-sm form-group">
-          <label for="name">Device Name</label>
-          <input name="name" id="name" class="form-control" value="{{device.name  }}" required>
-        </div>
-        <div class="col-sm form-group">
-          <label for="is_gateway">Is a Gateway</label><br>
-          <input name="is_gateway" id="is_gateway" class="form-check-input" type="checkbox" {% if device.is_gateway %}checked{% endif %}>
-        </div>
-      </div>
-    </br>
-      <div class="row">
-        <div class="col-sm ">
-          <label for="description">Device Description</label>
-          <textarea name="description" id="description" class="form-control">{{device.description }}</textarea>
-        </div>
-        <div class="col-sm ">
-          <label for="ip">Ipv4 Address</label>
-          <input name="ip" id="ip" class="form-control" value="{{ device.ipv4_address}}">
-        </div>
-      </div>
-    </br>
-      <div class="row">
-        <div class="col-sm ">
-          <input type="submit" class="btn btn-warning" value="Save Device">
-          <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device.id ) }}" role="button"> Cancel</a>
-        </div>
-      </div>
+  <nav class="navbar title-nav">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Devices</span>
     </div>
-  </form>
-  {% else %}
-  <h3>Device not found</h3>
-  {% endif %}
+  </nav>
+  <div class="page-content">
+    <p>Then you can edit the device general data.</p>
+    {% if device %}
+    <form method="post">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm form-group">
+            <label for="tag">Device Tag</label>
+            <input name="tag" id="tag" class="form-control" value="{{device.tag }}" readonly required>
+          </div>
+          <div class="col-sm form-group">
+            <label for="name">Device Name</label>
+            <input name="name" id="name" class="form-control" value="{{device.name  }}" required>
+          </div>
+          <div class="col-sm form-group">
+            <label for="is_gateway">Is a Gateway</label><br>
+            <input name="is_gateway" id="is_gateway" class="form-check-input" type="checkbox" {% if device.is_gateway %}checked{% endif %}>
+          </div>
+        </div>
+      </br>
+        <div class="row">
+          <div class="col-sm ">
+            <label for="description">Device Description</label>
+            <textarea name="description" id="description" class="form-control">{{device.description }}</textarea>
+          </div>
+          <div class="col-sm ">
+            <label for="ip">Ipv4 Address</label>
+            <input name="ip" id="ip" class="form-control" value="{{ device.ipv4_address}}">
+          </div>
+        </div>
+      </br>
+        <div class="row">
+          <div class="col-sm ">
+            <input type="submit" class="btn btn-warning" value="Save Device">
+            <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device.id ) }}" role="button"> Cancel</a>
+          </div>
+        </div>
+      </div>
+    </form>
+    {% else %}
+    <h3>Device not found</h3>
+    {% endif %}
+  </div>  
 </div>
 
 {% endblock %}
