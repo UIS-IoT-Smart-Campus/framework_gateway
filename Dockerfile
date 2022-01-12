@@ -7,8 +7,8 @@ EXPOSE 5000
 ENV FLASK_ENV=prod
 
 RUN pip install --upgrade pip
-COPY ./requeriments.txt /usr/src/app/requeriments.txt
-RUN pip install -r requierements.txt
+COPY ./requirements.txt /usr/src/app/requirements.txt
+RUN pip install -r requirements.txt
 
 COPY ./flaskr /usr/src/app/
 
