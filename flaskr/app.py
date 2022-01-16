@@ -18,6 +18,8 @@ app = Flask(__name__, instance_relative_config=True)
 
 #DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
 
+broker_url = os.getenv('BROKERURL');
+
 #Set app configuration
 app.config.from_mapping(
     SECRET_KEY='dev',
