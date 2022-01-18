@@ -1,10 +1,27 @@
 version: '3.4'
 
 services:
+  broker:
+    container_name: broker-gateway
+    image: eclipse-mosquitto
+    restart: always
+    ports:
+      - 1883:1883
+    networks:
+      - iot_network
   gatewayframework:
     image: gatewayframework
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    build: .
+    environment:
+        BROKERURL: broker
     ports:
       - 5000:5000
+    networks:
+      - iot_network
+    depends_on:
+      - broker
+      
+networks: 
+  iot_network:
+    driver: bridge
+    name: iot_network

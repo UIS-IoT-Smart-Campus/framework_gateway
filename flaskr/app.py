@@ -25,7 +25,7 @@ app.config.from_mapping(
     SECRET_KEY='dev',
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
     SQLALCHEMY_DATABASE_URI='sqlite:///instance/db.sqlite3',    
-    MQTT_BROKER_URL='172.17.0.2',
+    MQTT_BROKER_URL= broker_url,
     MQTT_BROKER_PORT=1883,
     MQTT_KEEPALIVE=60,
 )
