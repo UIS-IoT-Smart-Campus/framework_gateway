@@ -9,6 +9,8 @@ services:
       - 1883:1883
     networks:
       - iot_network
+    volumes:
+      - ./flaskr/mosquitto.conf:/mosquitto/config/mosquitto.conf
   gatewayframework:
     container_name: gatewayframework
     depends_on:
