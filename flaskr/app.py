@@ -18,14 +18,14 @@ app = Flask(__name__, instance_relative_config=True)
 
 #DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
 
-broker_url = os.getenv('BROKERURL');
+BROKERURL = str(os.getenv('BROKERURL'));
 
 #Set app configuration
 app.config.from_mapping(
     SECRET_KEY='dev',
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
     SQLALCHEMY_DATABASE_URI='sqlite:///instance/db.sqlite3',    
-    MQTT_BROKER_URL= broker_url,
+    MQTT_BROKER_URL= BROKERURL,
     MQTT_BROKER_PORT=1883,
     MQTT_KEEPALIVE=60,
 )
