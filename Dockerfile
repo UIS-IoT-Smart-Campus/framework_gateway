@@ -16,8 +16,9 @@ RUN pip install -r requirements.txt
 
 COPY ./flaskr /usr/src/app/
 
-#create database
-CMD ["python","startdb.py"]
+#copy database
+RUN mkdir /instance
+COPY ./flaskr/db.sqlite3 /usr/src/app/instance
 
 
 #Gunicorn 
