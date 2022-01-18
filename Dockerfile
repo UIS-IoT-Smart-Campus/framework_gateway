@@ -16,7 +16,9 @@ RUN pip install -r requirements.txt
 
 COPY ./flaskr /usr/src/app/
 
-RUN python startdb.py
+#create database
+CMD ["python","startdb.py"]
+
 
 #Gunicorn 
 CMD ["gunicorn","--bind","0.0.0.0:5000","wsgi:app"]
