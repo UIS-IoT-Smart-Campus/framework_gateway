@@ -18,7 +18,7 @@ COPY ./flaskr /usr/src/app/
 
 #copy database
 RUN mkdir /instance
-COPY ./flaskr/db.sqlite3 /usr/src/app/instance
+COPY ./flaskr/db.sqlite3 /usr/src/app/instance/db.sqlite3
 
 
 #Gunicorn 
