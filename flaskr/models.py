@@ -12,20 +12,33 @@ device_topics = db.Table('device_topics',
     db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'), primary_key=True),
 )
 
+device_categories = db.Table('device_categories',
+    db.Column('device_id', db.Integer, db.ForeignKey('device.id'), primary_key=True),
+    db.Column('category_id', db.Integer, db.ForeignKey('category.id'), primary_key=True),
+)
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
 
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False)    
+    description = db.Column(db.String(200))
+
 class Device(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    tag = db.Column(db.String(80), unique=True, nullable=False)
+    #tag = db.Column(db.String(80), unique=True, nullable=False)
     name = db.Column(db.String(80), nullable=False)    
     description = db.Column(db.String(200))
     topics = db.relationship('Topic',secondary=device_topics, lazy='subquery',backref=db.backref('device',lazy=True))
-    is_gateway = db.Column(db.Boolean,default=False)
-    ipv4_address = db.Column(db.String(20))
+    categories = db.relationship('Category',secondary=device_categories, lazy='subquery',backref=db.backref('device',lazy=True))
+    #is_gateway = db.Column(db.Boolean,default=False)
+    local_device = db.Column(db.Boolean,default=True)
+    create_at = db.Column(db.Date)
+    update_at = db.Column(db.Date)
     device_parent = db.Column(db.Integer, db.ForeignKey('device.id'))
 
     @property
@@ -33,12 +46,10 @@ class Device(db.Model):
        """Return object data in easily serializable format"""
        return {
            'id': self.id,
-           'tag': self.tag,
            'name': self.name,
            'description': self.description,
            'device_parent': self.device_parent,
-           'ipv4_address': self.ipv4_address,
-           'is_gateway':self.is_gateway,
+           'local_device':self.local_device,
            'topics': self.serializable_topics,
            'properties': self.serializable_properties,
            'resources':self.serializable_resources

@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.3'
 
 services:
   broker:
@@ -11,17 +11,17 @@ services:
       - iot_network
     volumes:
       - ./flaskr/mosquitto.conf:/mosquitto/config/mosquitto.conf
-  gatewayframework:
-    container_name: gatewayframework
-    depends_on:
-      - broker
-    build: .
-    environment:
-        BROKERURL: broker
-    ports:
-      - 5000:5000
-    networks:
-      - iot_network    
+  #gatewayframework:
+    #container_name: gatewayframework
+    #depends_on:
+    #  - broker
+    # build: .
+    # environment:
+    #     BROKERURL: broker
+    # ports:
+    #   - 5000:5000
+    # networks:
+    #   - iot_network    
       
 networks: 
   iot_network:

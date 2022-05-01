@@ -19,7 +19,7 @@ port = 1883
 topic = "gateway/record"
 client_id = 'python-mqtt-GAT001'
 #Message Parameter
-keys = ["cpu","ram","temperature"]
+keys = ["cpu","ram"]
 values = [0,0]
 delay_time = 1800
 
@@ -51,12 +51,12 @@ def publish(client):
     while True:
         cpu_usage = psutil.cpu_percent()
         memory_usage = psutil.virtual_memory().percent
-        temperature = psutil.sensors_temperatures()["cpu_thermal"][0][1]
+        #temperature = psutil.sensors_temperatures()["cpu_thermal"][0][1]
         
         values = []
         values.append(cpu_usage)
         values.append(memory_usage)
-        values.append(temperature)
+        #values.append(temperature)
         
         tz_Col = pytz.timezone('America/Bogota')
         now = datetime.now(tz_Col)

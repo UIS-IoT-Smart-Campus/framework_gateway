@@ -42,31 +42,68 @@
 
 {% block content %}
 <div>
-  <h1>Settings</h1>
-  <br>
-  <hr>
-  <a class="btn btn-sm btn-success" href="{{ url_for('gateway.settings_update') }}">Update Settings</a>
-  <table class="table">
-    <tbody>
-      <tr>
-        <td><b>Stand-Alone: </b>{{ settings['standalone'] }}</td>
-        <td><b>Backend IP: </b>{{ settings['backendIp'] }}</td>
-        <td><b>Backend Port: </b>{{ settings['backendPort'] }}</td>        
-      </tr>
-      <tr>
-        <td><b>Broker IP: </b>{{ settings['brokerIp'] }}</td>
-        <td><b>Broker Port: </b>{{ settings['brokerPort'] }}</td>
-        <td><b>Backend Topic: </b>{{ settings['backend_topic'] }}</td>
-      </tr>
-      <tr>
-        <td><b>Mqtt Client Name: </b>{{ settings['MqttClient'] }}</td>
-      </tr>
-    </tbody>
-  </table>
-  <br>
-  <form action="{{ url_for('gateway.settings') }}" method="POST">
-    <input class="btn-primary" type="submit" value="Reboot" onclick="alert('Reiniciando')">
-  </form>
+  <nav class="navbar title-nav">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Settings</span>
+    </div>
+  </nav>  
+  <div class="page-content">
+    
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Standalone Mode</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p><b>Warning:</b> disabling standalone mode will remove all local settings 
+              including devices and their properties, continuous internet connection is 
+              required for server synchronization.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <form action="{{ url_for('gateway.settings') }}" method="POST">
+              <input type="text" name="disablestandalone" value="True" style="display: none;">
+              <button type="submit" class="btn btn-warning">Disable</button>
+            </form>            
+          </div>
+        </div>
+      </div>
+    </div>
+    {% if settings['standalone'] %}
+    <p>This devices is running in standalone mode, if you want to connect to the backend server, please disable this mode.</p>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      Disable Standalone
+    </button>
+    {% else %}
+    <a class="btn btn-sm btn-success" href="{{ url_for('gateway.settings_update') }}" >Update Settings</a>
+    {% endif %}
+    
+    <table class="table">
+      <tbody>
+        <tr>
+          <td><b>Stand-Alone: </b>{{ settings['standalone'] }}</td>
+          <td><b>Backend IP: </b>{{ settings['backendIp'] }}</td>
+          <td><b>Backend Port: </b>{{ settings['backendPort'] }}</td>        
+        </tr>
+        <tr>
+          <td><b>Broker IP: </b>{{ settings['brokerIp'] }}</td>
+          <td><b>Broker Port: </b>{{ settings['brokerPort'] }}</td>
+          <td><b>Backend Topic: </b>{{ settings['backend_topic'] }}</td>
+        </tr>
+        <tr>
+          <td><b>Mqtt Client Name: </b>{{ settings['MqttClient'] }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <form action="{{ url_for('gateway.settings') }}" method="POST">
+      <input class="btn-primary" type="submit" value="Reboot" onclick="alert('Reiniciando')">
+    </form>
+  </div>
 </div>
 
 {% endblock %}

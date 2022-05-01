@@ -23,16 +23,16 @@ class Persistence():
     def insert_message(self,msg,device):        
         if msg["tag"] and msg["content"] and msg["topic"]:
             tag = str(msg["tag"])
-            topic = str(msg["topic"])
+            topic_msg = str(msg["topic"])
             db_t = TinyDB('device_data/'+device.tag+"/"+tag+".json")
-            table = db_t.table(topic)
+            table = db_t.table(topic_msg)
             values = msg["content"]
             values["time"] = msg["time"]
             table.insert(values)
-            topic = Topic.query.filter_by(topic=topic).first()
+            topic = Topic.query.filter_by(topic=topic_msg).first()
             device = Device.query.filter_by(tag=tag).first()
             if topic is None:
-                topic = Topic(topic=topic,active_devices=1)
+                topic = Topic(topic=topic_msg,active_devices=1)
             else:
                 add = True
                 for top_dev in device.topics:
