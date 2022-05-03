@@ -35,7 +35,7 @@ class Device(db.Model):
     description = db.Column(db.String(200))
     topics = db.relationship('Topic',secondary=device_topics, lazy='subquery',backref=db.backref('device',lazy=True))
     categories = db.relationship('Category',secondary=device_categories, lazy='subquery',backref=db.backref('device',lazy=True))
-    #is_gateway = db.Column(db.Boolean,default=False)
+    is_gateway = db.Column(db.Boolean,default=False)
     local_device = db.Column(db.Boolean,default=True)
     create_at = db.Column(db.Date)
     update_at = db.Column(db.Date)

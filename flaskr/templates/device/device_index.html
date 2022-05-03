@@ -53,24 +53,29 @@
   <div class="page-content">
     <p>In this section you can create, modify and delete devices, check devices properties and status.</p>
     <h3>Actions</h3>
+    {% if settings['standalone'] %}
     <div class="device_actions">
+      <a class="btn btn-success" href="{{ url_for('device.create_category') }}" role="button">Create Category</a>
       <a class="btn btn-success" href="{{ url_for('device.create') }}" role="button">Create Device</a>
     </div>
+    {% endif %}
     </br>
     <h3>Devices List</h3>
     <div class="devices_list">
       <table class="table">
           <tr>
-            <th>TAG</th>
             <th>Name</th>
             <th>Gateway</th>
+            <th>Create</th>
+            <th>Last Update</th>
             <th>Details</th>
           </tr>
           {% for device in devices %}
             <tr>
-              <td>{{ device['tag'] }}</td>
               <td>{{ device['name'] }}</td>
-              <td>{% if device['is_gateway'] %}Yes{% endif %}</td>
+              <td>{% if device['is_gateway'] %}<span class="badge bg-success">yes</span>{% endif %}</td>
+              <td>{{ device['create_at'] }}</td>
+              <td>{{ device['update_at'] }}</td>
               <td><a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=device['id']) }}" role="button">Details</a></td>
             </tr>
           {% endfor %}

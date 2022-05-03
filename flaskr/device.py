@@ -2,12 +2,14 @@ import re
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
+from sqlalchemy import update
 
 
 from werkzeug.exceptions import abort
 
 from auth import login_required
-from models import Device,Property,Resource
+from models import Category, Device,Property,Resource
+from datetime import date
 
 from flask import request,Response,make_response
 from flask import jsonify
@@ -17,10 +19,24 @@ from app import db
 
 import os
 import shutil
+import configparser
+
 
 bp = Blueprint('device', __name__, url_prefix='/device')
 
 
+def get_config_values() -> dict:
+    settings = {}
+    config = configparser.ConfigParser()
+    config.readfp(open('init.cfg'))
+    settings["standalone"] = config.getboolean('DEFAULT','standalone')
+    settings["backendIp"] = config.get('DEFAULT','backendIp')
+    settings["backendPort"] = config.get('DEFAULT','backendPort')
+    settings["brokerIp"] = config.get('DEFAULT','brokerIp')
+    settings["brokerPort"] = config.get('DEFAULT','brokerPort')
+    settings["backend_topic"] = config.get('DEFAULT','backend_topic')
+    settings["MqttClient"] = config.get('DEFAULT','MqttClient')
+    return settings
 
 #Delete Resource
 def delete_resource_method(resource):
@@ -42,7 +58,7 @@ def delete_device_method(device):
     properties = Property.query.filter_by(device_id=device.id)
     for property in properties:
         db.session.delete(property)
-    dirc= 'device_data/'+device.tag+'/'
+    dirc= 'device_data/'+str(device.id)+'/'
     db.session.delete(device)
     db.session.commit()
     if os.path.isdir(dirc):
@@ -54,7 +70,8 @@ def delete_device_method(device):
 def device_index():
     """ Devices Index Section"""
     devices = Device.query.filter_by(device_parent=None)
-    return render_template('device/device_index.html', devices=devices)
+    settings = get_config_values()
+    return render_template('device/device_index.html', devices=devices,settings=settings)
 
 #Device Detail View
 @bp.route('/<int:id>/view', methods=['GET'])
@@ -73,48 +90,80 @@ def device_view(id):
 @login_required
 def create():
     devices = db.session.query(Device).all()
+    categories = db.session.query(Category).all()
+
     """View for create devices"""
     if request.method == 'POST':
 
-        tag = request.form['tag']
         name = request.form['name']
-        is_gateway = request.form.get('is_gateway',False)
         description = request.form['description']
-        ip = request.form['ip']
+        is_gateway = request.form.get('is_gateway',False)
+        categories = request.form.getlist('device_categories')
         device_parent = request.form['device_parent']
+        create_at = update_at = date.today()
         error = None
 
         if is_gateway:
             is_gateway = True
 
-        if not tag or not name:
-            error = 'No mandatory property is set.'
-        else:
-            device = Device.query.filter_by(tag=tag).first()
-            if device is not None:
-                error = "The tag is already exist."      
+        if not name:
+            error = 'No mandatory property is set.'     
 
         if error is not None:
             flash(error)
         else:            
             try:
-                directory = "device_data/"+tag
+                count_dev_str = str(len(devices)+1)
+                directory = "device_data/"+count_dev_str
                 if not os.path.exists(directory):
                     os.makedirs(directory)
+                categories_instances = []
+                if categories:                    
+                    for category in categories:
+                        cat_ins = Category.query.filter_by(id=category).first()
+                        categories_instances.append(cat_ins)
                 if device_parent != "null":
-                    device = Device(tag=tag, name=name, description=description,is_gateway=is_gateway, ipv4_address=ip, device_parent=device_parent)
+                    device = Device(name=name, description=description,categories = categories_instances, is_gateway=is_gateway, create_at = create_at, update_at=update_at, device_parent=device_parent)
                 else:
-                    device = Device(tag=tag, name=name, is_gateway=is_gateway, ipv4_address=ip, description=description)
+                    device = Device(name=name, description=description, categories = categories_instances, is_gateway=is_gateway, create_at = create_at, update_at=update_at)
                 db.session.add(device)
                 db.session.commit()
                 return redirect(url_for('device.device_index'))
 
             except OSError as e:
-                flash("Creation of the directory %s failed" % tag)
+                flash("Creation of the directory %s failed" % count_dev_str)
+            except Exception as e:
+                print(e)
+                flash("DB Creation Failed")
+
+    return render_template('device/create.html',devices=devices, categories = categories)
+
+#Create Category
+@bp.route('/create_category', methods=('GET', 'POST'))
+@login_required
+def create_category():
+    """View for create categories"""
+    if request.method == 'POST':
+        name = request.form['name']        
+        description = request.form['description']
+        error = None
+
+        if not name:
+            error = 'No mandatory property is set.'  
+
+        if error is not None:
+            flash(error)
+        else:            
+            try:
+                category = Category(name=name, description=description)                
+                db.session.add(category)
+                db.session.commit()
+                return redirect(url_for('device.device_index'))
+
             except Exception as e:
                 flash("DB Creation Failed")
 
-    return render_template('device/create.html',devices=devices)
+    return render_template('device/create_category.html')
 
 
 #Edit Device
@@ -130,18 +179,15 @@ def edit_device(id):
             name = request.form['name']
             is_gateway = request.form.get('is_gateway',False)
             description = request.form['description']
-            ip = request.form['ip']
-
+            update_at = date.today()
             
             if is_gateway:
-                is_gateway = True
-
-            
+                is_gateway = True            
             try:
                 device.name = name
                 device.is_gateway = is_gateway
                 device.description = description
-                device.ipv4_address = ip
+                device.update_at = update_at
                 db.session.add(device)
                 db.session.commit()
 
@@ -169,6 +215,7 @@ def delete_device(id):
                 return redirect(url_for('device.device_index'))
 
             except Exception as e:
+                print(e)
                 flash("DB Deleted Failed - %s".format(e))
     else:
         flash("Device Not Found")

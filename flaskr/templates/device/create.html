@@ -72,11 +72,14 @@
           <div class="col-sm-4">
             <label for="device_categories">Categories</label>
             <select name="device_categories" class="selectpicker" multiple>
-              <option>Mustard</option>
-              <option>Ketchup</option>
-              <option>Relish</option>
-            </select>
-                     
+              {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </select>                     
+          </div>
+          <div class="col-sm-4">            
+            <input name="is_gateway" id="is_gateway" class="form-check-input" type="checkbox">
+            <label for="is_gateway">Is a Gateway</label>                  
           </div>
           <div class="col-sm-4">
             <label for="device_parent">Device Parent</label>

@@ -49,9 +49,8 @@
     </div>
   </nav>
   <div class="page-content">
-    <h3>Device {{ device.tag }}</h3>
+    <h2>Device {{ device.name }}</h2>
     <div class="row">
-      <h4>Actions</h4>
         <div class="col-sm">
           <a class="btn btn-primary btn-sm" href="{{ url_for('device.edit_device', id=device['id']) }}" role="button">Update Device</a>
           <a class="btn btn-danger btn-sm" href="{{ url_for('device.delete_device', id=device['id']) }}" role="button">Delete Device</a>
@@ -62,7 +61,7 @@
     </div><br><br>
     <ul class="nav nav-tabs" id="myTab" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="sumary-tab" data-bs-toggle="tab" data-bs-target="#sumary" type="button" role="tab" aria-controls="sumary" aria-selected="true">Sumary</button>
+        <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab" aria-controls="summary" aria-selected="true">Summary</button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="properties-tab" data-bs-toggle="tab" data-bs-target="#properties" type="button" role="tab" aria-controls="properties" aria-selected="false">Properties</button>
@@ -75,30 +74,38 @@
       </li>
     </ul>
     <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active" id="sumary" role="tabpanel" aria-labelledby="sumary-tab">
+      <div class="tab-pane fade show active" id="summary" role="tabpanel" aria-labelledby="summary-tab">
         {% if device %}
         <table class="table">
             <br>
-            <tbody>
+            <tbody>              
               <tr>
-                <td><b>Device TAG:</b></td>
-                <td>{{ device.tag }}</td>
-              </tr>
-              <tr>
-                <td><b>Device Name:</b></td>
+                <td><b>Name:</b></td>
                 <td>{{ device.name }}</td>
-              </tr>
-              <tr>
-                <td><b>Device Ipv4 Address:</b></td>
-                <td>{{ device.ipv4_address }}</td>
               </tr>
               <tr>
                 <td><b>Description:</b></td>
                 <td>{{ device.description }}</td>
               </tr>
               <tr>
+                <td><b>Categories:</b></td>
+                <td>{% for category in device.categories %}<span class="badge bg-success">{{ category.name }}</span>&nbsp;{% endfor %}</td>
+              </tr>
+              <tr>
+                <td><b>Create at:</b></td>
+                <td>{{ device.create_at }}</td>
+              </tr>
+              <tr>
+                <td><b>Update at:</b></td>
+                <td>{{ device.update_at }}</td>
+              </tr>
+              <tr>
                 <td><b>Is Gateway:</b></td>
-                <td>{% if device.is_gateway%}YES{%else%}NO{% endif %}</td>
+                <td>{% if device.is_gateway%}<span class="badge rounded-pill bg-primary">YES</span>{%else%}<span class="badge rounded-pill bg-secondary">No</span>{% endif %}</td>
+              </tr>
+              <tr>
+                <td><b>Local Device:</b></td>
+                <td>{% if device.local_device%}<span class="badge rounded-pill bg-primary">YES</span>{%else%}<span class="badge rounded-pill bg-secondary">No</span>{% endif %}</td>
               </tr>
             </tbody>
           </table>

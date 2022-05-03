@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 
 
-{% block title %}New Device{% endblock %}
+{% block title %}New Category{% endblock %}
+
 
 {% block menu %}
 <ul class="nav nav-pills flex-column mb-auto">
@@ -40,47 +41,40 @@
 </ul>
 {% endblock %}
 
+
 {% block content %}
 <div>
   <nav class="navbar title-nav">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Devices</span>
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Categories</span>
     </div>
   </nav>
   <div class="page-content">
-    <p>Then you can edit the device general data.</p>
-    {% if device %}
+    <p>Then you can create a new local category.</p>
     <form method="post">
       <div class="container">
-        <div class="row">          
+        <fieldset>
+          <legend>Create Category</legend>
+        <div class="row">
           <div class="col-sm form-group">
-            <label for="name">Device Name</label>
-            <input name="name" id="name" class="form-control" value="{{device.name  }}" required>
+            <label for="name">Name</label>
+            <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>
           </div>
           <div class="col-sm ">
-            <label for="description">Device Description</label>
-            <textarea name="description" id="description" class="form-control">{{device.description }}</textarea>
+            <label for="description">Description</label>
+            <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
           </div>
         </div>
-      </br>
-        <div class="row">
-          <div class="col-sm form-group">            
-            <input name="is_gateway" id="is_gateway" class="form-check-input" type="checkbox" {% if device.is_gateway %}checked{% endif %}>
-            <label for="is_gateway">Is a Gateway</label>
-          </div>
-        </div>
-      </br>
+        </br>
         <div class="row">
           <div class="col-sm ">
-            <input type="submit" class="btn btn-warning" value="Save Device">
-            <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device.id ) }}" role="button"> Cancel</a>
+            <input type="submit" class="btn btn-success" value="Create Category">
+            <a class="btn btn-danger" href="{{ url_for('device.device_index') }}" role="button"> Cancel</a>
           </div>
         </div>
       </div>
+    </fieldset>
     </form>
-    {% else %}
-    <h3>Device not found</h3>
-    {% endif %}
   </div>  
 </div>
 
