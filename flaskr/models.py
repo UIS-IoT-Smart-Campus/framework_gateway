@@ -93,8 +93,7 @@ class Topic(db.Model):
         }
 
 class Resource(db.Model):
-    id =  db.Column(db.Integer, primary_key=True)    
-    tag = db.Column(db.String(80), unique=True, nullable=False)
+    id =  db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(200))
     resource_type = db.Column(db.String(80), nullable=False)
@@ -103,7 +102,6 @@ class Resource(db.Model):
     @property
     def serializable(self):
         return {
-            'tag': self.tag,
             'name': self.name,
             'description': self.description,
             'type': self.resource_type
@@ -112,7 +110,6 @@ class Resource(db.Model):
     @property
     def serialize(self):
         return {
-            'tag': self.tag,
             'name': self.name,
             'description': self.description,
             'type': self.resource_type,

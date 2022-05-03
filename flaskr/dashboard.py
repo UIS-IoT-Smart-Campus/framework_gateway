@@ -5,11 +5,34 @@ from flask import (
 from auth import login_required
 
 from app import db
-from models import Device
+from models import Device,Resource
 
 
 
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
+
+def add_device(device,nodes,links,parent_node, nodes_count):
+    #Agregar nodo dispositivo
+    node = {"name":device.name,"type":"Device"}
+    nodes.append(node)
+    nodes_count+=1
+    device_node = nodes_count
+    links.append({"source":parent_node,"target":nodes_count})
+    #Agregar recursos dispositivo
+    resources = Resource.query.filter_by(device_id=device.id)
+    for resource in resources:
+        #Agregar nodo recurso
+        if resource.resource_type == "SENSOR":
+            node = {"name":resource.name,"type":"Sensor"}
+        else:
+            node = {"name":resource.name,"type":"Actuator"}
+        nodes.append(node)
+        nodes_count+=1
+        links.append({"source":device_node,"target":nodes_count})
+    devices = Device.query.filter_by(device_parent=device.id)
+    for device_s in devices:
+        nodes_count = add_device(device_s,nodes,links,device_node,nodes_count)
+    return nodes_count
 
 
 #Index
@@ -19,17 +42,15 @@ def index():
     """ Dashboard Index Section"""
     nodes = []
     links = []
-    devices_count = 0
+    nodes_count = 0
+    parent_node = 0
 
     #Add self-node
     node = {"name":"Gateway","type":"Gateway"}
     nodes.append(node)
 
-    devices = db.session.query(Device).all()
+    devices = Device.query.filter_by(device_parent=None)
     for device in devices:
-        node = {"name":device.name,"type":"Device"}
-        nodes.append(node)
-        devices_count+=1
-        links.append({"source":0,"target":devices_count})        
+        nodes_count = add_device(device,nodes,links,parent_node,nodes_count)             
 
     return render_template('dashboard/index.html', nodes = nodes, links = links)

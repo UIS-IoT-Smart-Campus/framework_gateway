@@ -54,11 +54,7 @@
     <p>Then you can create a new Resource.</p>
     <form method="post">
       <div class="container">
-        <div class="row">
-          <div class="col-sm form-group">
-              <label for="tag">Resource Tag</label>
-              <input name="tag" id="tag" class="form-control" value="{{ request.form['tag'] }}" required>
-            </div>
+        <div class="row">          
           <div class="col-sm form-group">
             <label for="name">Resource Name</label>
             <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>

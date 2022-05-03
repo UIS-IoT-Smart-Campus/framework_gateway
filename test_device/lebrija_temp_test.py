@@ -19,7 +19,7 @@ port = 1883
 topic = "device/data"
 client_id = 'python-mqtt-A001'
 #Message Parameter
-tag = "A001"
+id = 3
 msg_topic = "temp_lebrija"
 content = {"temp":0,"feels_like":0,"pressure":0,"humidity":0}
 delay_time = 3600
@@ -50,7 +50,7 @@ def get_message():
     now = datetime.now(tz_Col)
     current_time = now.strftime("%d-%m-%Y %H:%M:%S")
 
-    msg = {"tag":tag,"topic":msg_topic,"content":content,"time":current_time}
+    msg = {"id":id,"topic":msg_topic,"content":content,"time":current_time}
     msg_json = json.dumps(msg)
     return msg_json
     

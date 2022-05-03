@@ -64,6 +64,7 @@
     <div class="devices_list">
       <table class="table">
           <tr>
+            <th>Id</th>
             <th>Name</th>
             <th>Gateway</th>
             <th>Create</th>
@@ -72,6 +73,7 @@
           </tr>
           {% for device in devices %}
             <tr>
+              <td>{{ device['id'] }}</td>
               <td>{{ device['name'] }}</td>
               <td>{% if device['is_gateway'] %}<span class="badge bg-success">yes</span>{% endif %}</td>
               <td>{{ device['create_at'] }}</td>

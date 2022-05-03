@@ -4,6 +4,7 @@ from models import User,Device,Topic
 from app import db
 
 import json
+import pytz
 from datetime import datetime
 from paho.mqtt import client as mqtt_client
 import configparser
@@ -21,35 +22,40 @@ class Persistence():
     values: Is the values for store
     """
     def insert_message(self,msg,device):        
-        if msg["tag"] and msg["content"] and msg["topic"]:
-            tag = str(msg["tag"])
+        if msg["id"] and msg["content"] and msg["topic"]:
             topic_msg = str(msg["topic"])
-            db_t = TinyDB('device_data/'+device.tag+"/"+tag+".json")
+            db_t = TinyDB('device_data/'+str(device.id)+"/"+str(device.id)+".json")
             table = db_t.table(topic_msg)
             values = msg["content"]
             values["time"] = msg["time"]
             table.insert(values)
+            tz_Col = pytz.timezone('America/Bogota')
+            now = datetime.now(tz_Col)
             topic = Topic.query.filter_by(topic=topic_msg).first()
-            device = Device.query.filter_by(tag=tag).first()
             if topic is None:
-                topic = Topic(topic=topic_msg,active_devices=1)
+                topic = Topic(topic=topic_msg,active_devices=1, last_update=now)
+                device.topics.append(topic)
+                db.session.add(device)
             else:
                 add = True
                 for top_dev in device.topics:
                     if top_dev.topic == topic.topic:
                         add = False
+                        topic.last_update = now
+                        db.session.add(topic)
                 if add:
                     topic.active_devices += 1
-                topic.last_update = datetime.utcnow()
+                    topic.last_update = now
+                    device.topics.append(topic)
+                    db.session.add(device)   
+                                   
             
-            device.topics.append(topic)            
-            db.session.add(device)
             db.session.commit()
 
             config = configparser.ConfigParser()
             config.readfp(open('init.cfg'))
             standalone = config.getboolean('DEFAULT','standalone')
-            if standalone:
+            if not standalone:
                 #Send message to MQTT broker
                 if msg["time"]:
                     msg.pop("time",None)
@@ -93,9 +99,10 @@ class Persistence():
     @staticmethod
     def delete_device_topic(device,topic):
         try:
-            db_t = TinyDB('device_data/'+device.tag+"/"+device.tag+".json")
+            db_t = TinyDB('device_data/'+str(device.id)+"/"+str(device.id)+".json")
             table = db_t.table(topic.topic)
             table.truncate()
+            db_t.drop_table(topic.topic)
             return 1
         except:
             return 0

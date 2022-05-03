@@ -77,8 +77,7 @@ def delete_topic(id):
         if request.method == 'POST':
             try:
                 devices = Device.query.with_parent(topic)
-                for device in devices:
-                    print(topic.topic)
+                for device in devices:                    
                     delete = Persistence().delete_device_topic(device,topic)
                     if not delete:
                         flash("Problems deleting topic from the device")

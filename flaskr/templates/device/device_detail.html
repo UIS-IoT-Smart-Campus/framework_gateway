@@ -146,7 +146,6 @@
                 <table class="table">
                     <thead>
                       <tr>
-                        <th scope="col">TAG</th>
                         <th scope="col">Name</th>
                         <th scope="col">Details</th>
                       </tr>
@@ -154,7 +153,6 @@
                     <tbody>
                       {% for off_device in offspring_devices%}
                       <tr>
-                        <td>{{ off_device.tag }}</td>
                         <td>{{ off_device.name}}</td>
                         <td><a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=off_device['id']) }}" role="button">details</a></td>
                       </tr>
@@ -173,7 +171,6 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th scope="col">Tag</th>
                     <th scope="col">Name</th>
                     <th scope="col">Type</th>
                     <th scope="col">Actions</th>
@@ -182,7 +179,6 @@
                 <tbody>
                   {% for resource in resources %}
                   <tr>
-                    <td>{{ resource['tag'] }}</td>
                     <td>{{ resource['name'] }}</td>
                     <td>{{ resource['resource_type'] }}</td>
                     <td><a class="btn btn-primary btn-sm" href="{{ url_for('device.resource_view', id=resource['id'] ) }}" role="button">Details</a></td>

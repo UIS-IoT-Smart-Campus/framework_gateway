@@ -355,25 +355,20 @@ def create_resource(id):
     """View for create resources"""
     if request.method == 'POST':
 
-        r_tag = request.form['tag']
         r_name = request.form['name']
         r_type = request.form['type']
         r_description = request.form['description']
         device_id = device.id
         error = None
 
-        if not r_tag or not r_name or not r_type:
-            error = 'No mandatory property is set.'
-        
-        resource = Resource.query.filter_by(tag=r_tag).first()
-        if resource is not None:
-            error = 'The Tag is already exist'
+        if not r_name or not r_type:
+            error = 'No mandatory property is set.'        
 
         if error is not None:
             flash(error)
         else:            
             try:
-                resource_d = Resource(tag=r_tag, name=r_name, description=r_description, resource_type=r_type,device_id=device_id)
+                resource_d = Resource(name=r_name, description=r_description, resource_type=r_type,device_id=device_id)
                 db.session.add(resource_d)
                 db.session.commit()
                 return redirect(url_for('device.device_view',id=device.id))
