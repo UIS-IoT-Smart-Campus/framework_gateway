@@ -7,26 +7,40 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 from flask_migrate import Migrate
 
+import configparser
 
 
 #Initial configuration
 test_config = None
 
+#Get OS variables or init.cfg values
+def get_config_values()-> dict:
+    settings = {}
+    config = configparser.ConfigParser()
+    config.readfp(open('init.cfg'))
+    settings["standalone"] = config.getboolean('DEFAULT','standalone')
+    settings["backendIp"] = config.get('DEFAULT','backendIp')
+    settings["backendPort"] = config.get('DEFAULT','backendPort')
+    settings["brokerIp"] = config.get('DEFAULT','brokerIp')
+    settings["brokerPort"] = config.getint('DEFAULT','brokerPort')
+    settings["backend_topic"] = config.get('DEFAULT','backend_topic')
+    settings["MqttClient"] = config.get('DEFAULT','MqttClient')
+    return settings
 
 #Create and configure the app
 app = Flask(__name__, instance_relative_config=True)
 
 #DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
 
-BROKERURL = str(os.getenv('BROKERURL'));
+settings = get_config_values()
 
 #Set app configuration
 app.config.from_mapping(
     SECRET_KEY='dev',
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
     SQLALCHEMY_DATABASE_URI='sqlite:///instance/db.sqlite3',    
-    MQTT_BROKER_URL= BROKERURL,
-    MQTT_BROKER_PORT=1883,
+    MQTT_BROKER_URL= settings["brokerIp"],
+    MQTT_BROKER_PORT= settings["brokerPort"],
     MQTT_KEEPALIVE=60,
 )
 

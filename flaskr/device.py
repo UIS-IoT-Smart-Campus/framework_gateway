@@ -14,7 +14,7 @@ from datetime import date
 from flask import request,Response,make_response
 from flask import jsonify
 import json
-from tinydb import TinyDB, Query
+from tinydb import TinyDB
 from app import db
 
 import os
@@ -113,7 +113,10 @@ def create():
             flash(error)
         else:            
             try:
-                count_dev_str = str(len(devices)+1)
+                if len(devices)!=0:
+                    count_dev_str = str(devices[len(devices)-1].id+1)
+                else:
+                    count_dev_str = "1"
                 directory = "device_data/"+count_dev_str
                 if not os.path.exists(directory):
                     os.makedirs(directory)
@@ -250,8 +253,6 @@ def create_property(id):
                 db.session.commit()
                 return redirect(url_for('device.device_view',id=device.id))
 
-            except OSError as e:
-                flash("Creation of the directory %s failed" % e)
             except Exception as e:
                 flash("DB Creation Failed")
 

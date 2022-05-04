@@ -57,9 +57,6 @@ def create_topic():
                 db.session.add(topic)
                 db.session.commit()
                 return redirect(url_for('topic.topic_index'))
-
-            except OSError as e:
-                flash("Creation of the directory %s failed" % tag)
             except Exception as e:
                 print(e)
                 flash("DB Creation Failed")

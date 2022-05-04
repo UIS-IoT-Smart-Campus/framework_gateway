@@ -30,7 +30,7 @@ class Category(db.Model):
 
 class Device(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    #tag = db.Column(db.String(80), unique=True, nullable=False)
+    backendid = db.Column(db.Integer)
     name = db.Column(db.String(80), nullable=False)    
     description = db.Column(db.String(200))
     topics = db.relationship('Topic',secondary=device_topics, lazy='subquery',backref=db.backref('device',lazy=True))
@@ -46,6 +46,7 @@ class Device(db.Model):
        """Return object data in easily serializable format"""
        return {
            'id': self.id,
+           'backendid': self.backendid,
            'name': self.name,
            'description': self.description,
            'device_parent': self.device_parent,
@@ -94,6 +95,7 @@ class Topic(db.Model):
 
 class Resource(db.Model):
     id =  db.Column(db.Integer, primary_key=True)
+    backendid = db.Column(db.Integer)
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(200))
     resource_type = db.Column(db.String(80), nullable=False)
@@ -128,6 +130,7 @@ class Resource(db.Model):
 
 class Property(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    backendid = db.Column(db.Integer)
     name = db.Column(db.String(80), nullable=False)
     value = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(200))

@@ -68,7 +68,7 @@ class Persistence():
                         pass
                         #print("Failed to connect, return code %d\n", rc)
                 broker = config.get('DEFAULT','brokerIp')
-                port = config.get('DEFAULT','brokerPort')
+                port = config.getint('DEFAULT','brokerPort')
                 backend_topic = config.get('DEFAULT','backend_topic')
                 MqttClient = config.get('DEFAULT','MqttClient')
                 client = mqtt_client.Client(MqttClient)
