@@ -54,7 +54,7 @@
         <div class="col-sm">
           <a class="btn btn-primary btn-sm" href="{{ url_for('device.edit_device', id=device['id']) }}" role="button">Update Device</a>
           <a class="btn btn-danger btn-sm" href="{{ url_for('device.delete_device', id=device['id']) }}" role="button">Delete Device</a>
-          {% if device.device_parent != None %}
+          {% if device.device_parent != 1 %}
           <a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=device['device_parent']) }}" role="button">Device Parent</a>
           {% endif %}
         </div>

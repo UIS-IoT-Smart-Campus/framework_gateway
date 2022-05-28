@@ -58,8 +58,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p><b>Warning:</b> disabling standalone mode will remove all local settings 
-              including devices and their properties, continuous internet connection is 
+            <p><b>Warning:</b> continuous internet connection is 
               required for server synchronization.</p>
           </div>
           <div class="modal-footer">
@@ -78,26 +77,39 @@
     <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#exampleModal">
       Disable Standalone
     </button>
-    {% else %}
-    <a class="btn btn-sm btn-success" href="{{ url_for('gateway.settings_update') }}" >Update Settings</a>
-    <a class="btn btn-sm btn-success" href="{{ url_for('gateway.settings_update') }}" >Update Settings</a>
-    {% endif %}
-    
     <table class="table">
       <tbody>
         <tr>
           <td><b>Stand-Alone: </b>{{ settings['standalone'] }}</td>
-          <td><b>Backend IP: </b>{{ settings['backendip'] }}</td>
-          <td><b>Backend Port: </b>{{ settings['backendport'] }}</td>        
+          <td><b>Devices Broker URL: </b>{{ settings['devicebrokerurl'] }}</td>
+          <td><b>Devices Broker Port: </b>{{ settings['devicebrokerport'] }}</td>
         </tr>
         <tr>
-          <td><b>Broker IP: </b>{{ settings['brokerip'] }}</td>
-          <td><b>Broker Port: </b>{{ settings['brokerport'] }}</td>
-          <td><b>Backend Topic: </b>{{ settings['backend_topic'] }}</td>
+          <td><b>Device Broker Topic: </b>{{ settings['devicebrokertopic'] }}</td>
+          <td><b>MQTT Keep Alive: </b>{{ settings['mqttkeepalive'] }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% else %}
+    <a class="btn btn-sm btn-success" href="{{ url_for('gateway.settings_update') }}" >Update Settings</a>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td><b>Stand-Alone: </b>{{ settings['standalone'] }}</td>
+          <td><b>Devices Broker URL: </b>{{ settings['devicebrokerurl'] }}</td>
+          <td><b>Devices Broker Port: </b>{{ settings['devicebrokerport'] }}</td>
+          <td><b>Devices Broker Topic: </b>{{ settings['devicebrokertopic'] }}</td>
+        </tr>
+        <tr>          
+          <td><b>Backend URL: </b>{{ settings['backendurl'] }}</td>
+          <td><b>Backend Port: </b>{{ settings['backendport'] }}</td>
+          <td><b>Broker IP: </b>{{ settings['brokerbackendurl'] }}</td>
+          <td><b>Broker Port: </b>{{ settings['brokerbackendport'] }}</td>   
         </tr>
         <tr>
-          <td><b>Mqtt Client Name: </b>{{ settings['MqttClient'] }}</td>
-          <td><b>Synchronized: </b>{{ settings['synchronized'] }}</td>
+          <td><b>Broker Topic: </b>{{ settings['brokerbackendtopic'] }}</td>
+          <td><b>MQTT Client Name: </b>{{ settings['mqttclient'] }}</td>
+          <td><b>Backend Gateway Id: </b>{{ settings['backendgatewayid'] }}</td>
         </tr>
       </tbody>
     </table>
@@ -107,16 +119,12 @@
         <td>
           <form action="{{ url_for('gateway.settings') }}" method="POST">
             <input type="text" name="synchronized" value="True" style="display: none;">
-            <input class="btn btn-primary" type="submit" value="Synchronize">
-          </form>
-        </td>
-        <td>
-          <form action="{{ url_for('gateway.settings') }}" method="POST">
-            <input class="btn btn-danger" type="submit" value="Reboot" onclick="alert('Reiniciando')">
+            <input class="btn btn-primary" type="submit" value="Get-Representation">
           </form>
         </td>
       </tr>
     </table>
+    {% endif %}    
   </div>
 </div>
 

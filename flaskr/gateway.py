@@ -18,43 +18,12 @@ import configparser
 import shutil
 import os
 import requests as rq
+import selfconfig as sc
 from datetime import datetime
 from datetime import timezone
 
 bp = Blueprint('gateway', __name__, url_prefix='/gateway')
 
-def get_config_values() -> dict:
-    settings = {}
-    config = configparser.ConfigParser()
-    config.readfp(open('init.cfg'))
-    settings["standalone"] = config.getboolean('DEFAULT','standalone')
-    settings["backendip"] = config.get('DEFAULT','backendip')
-    settings["backendport"] = config.get('DEFAULT','backendport')
-    settings["brokerip"] = config.get('DEFAULT','brokerip')
-    settings["brokerport"] = config.get('DEFAULT','brokerport')
-    settings["backend_topic"] = config.get('DEFAULT','backend_topic')
-    settings["MqttClient"] = config.get('DEFAULT','MqttClient')
-    settings["synchronized"] = config.get('DEFAULT','synchronized')
-    settings["gatewayId"] = config.getint('DEFAULT','gatewayId')
-    return settings
-
-def set_config_values(settings):
-    last_settings = get_config_values()
-    if 'standalone' in settings: last_settings['standalone'] = settings['standalone']
-    if 'backendip' in settings: last_settings['backendip'] = settings['backendip']
-    if 'backendport' in settings: last_settings['backendport'] = settings['backendport']
-    if 'brokerip' in settings: last_settings['brokerip'] = settings['brokerip']
-    if 'brokerport' in settings: last_settings['brokerport'] = settings['brokerport']
-    if 'backend_topic' in settings: last_settings['backend_topic'] = settings['backend_topic']
-    if 'MqttClient' in settings: last_settings['MqttClient'] = settings['MqttClient']
-    if 'synchronized' in settings: last_settings['synchronized'] = settings['synchronized']
-    if 'gatewayId' in settings: last_settings['gatewayId'] = settings['gatewayId']
-    #Save Settings
-    config = configparser.ConfigParser()
-    config['DEFAULT'] = last_settings
-    with open('init.cfg', 'w') as configfile:
-        config.write(configfile)
-    return last_settings
 
 def delete_info():
     devices = db.session.query(Device).all()
@@ -79,10 +48,9 @@ def delete_info():
 
 def disable_standalone():
     #Update internal Settings
-    delete_info()
     settings = {}
     settings['standalone'] = 'false'
-    settings = set_config_values(settings)
+    settings = sc.set_config_values(settings)
 
 def create_json_respresentation(json_response,device_parent):    
     #Create Gateway Device
@@ -153,17 +121,12 @@ def settings():
             disable_standalone()
             return render_template('index.html')
         elif request.form.get('synchronized',False):
-            print("sincronizando")
             settings = get_config_values()
             synchronized_gateway(settings)
             return render_template('gateway/settings.html',settings=settings)
-        else:
-            #os.system('sudo reboot now')
-            print("reboot")
-            return render_template('index.html')
             
     else:
-        settings = get_config_values()
+        settings = sc.get_config_values()
         return render_template('gateway/settings.html',settings=settings)
 
 
@@ -175,14 +138,15 @@ def settings_update():
         #Get settings form
         settings = {}
         settings['standalone'] = request.form.get('standalone','false')
-        settings['backendIp'] = request.form.get('backendip','127.0.0.1')
-        settings['backendPort'] = request.form.get('backendport','8080')
-        settings['brokerIp'] = request.form.get('brokerip','127.0.0.1')
-        settings['brokerPort'] = request.form.get('brokerport','1883')
-        settings['backend_topic'] = request.form.get('backendtopic','devices/messages/')
-        settings['MqttClient'] = request.form.get('mqttclientname','GT001')
-        settings = set_config_values(settings)
+        settings['backendurl'] = request.form.get('backendurl','127.0.0.1')
+        settings['backendport'] = request.form.get('backendport','8080')
+        settings['brokerbackendurl'] = request.form.get('brokerbackendurl','127.0.0.1')
+        settings['brokerbackendport'] = request.form.get('brokerbackendport','1883')
+        settings['brokerbackendtopic'] = request.form.get('brokerbackendtopic','devices/messages/')
+        settings['mqttclient'] = request.form.get('mqttclient','GT001')
+        settings['backendgatewayid'] = request.form.get('backendgatewayid','0')
+        settings = sc.set_config_values(settings)
         return redirect(url_for('gateway.settings'))
     else:
-        settings = get_config_values()
+        settings = sc.get_config_values()
         return render_template('gateway/update-settings.html',settings=settings)

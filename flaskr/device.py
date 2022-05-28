@@ -20,23 +20,10 @@ from app import db
 import os
 import shutil
 import configparser
-
+import selfconfig as sc
 
 bp = Blueprint('device', __name__, url_prefix='/device')
 
-
-def get_config_values() -> dict:
-    settings = {}
-    config = configparser.ConfigParser()
-    config.readfp(open('init.cfg'))
-    settings["standalone"] = config.getboolean('DEFAULT','standalone')
-    settings["backendIp"] = config.get('DEFAULT','backendIp')
-    settings["backendPort"] = config.get('DEFAULT','backendPort')
-    settings["brokerIp"] = config.get('DEFAULT','brokerIp')
-    settings["brokerPort"] = config.get('DEFAULT','brokerPort')
-    settings["backend_topic"] = config.get('DEFAULT','backend_topic')
-    settings["MqttClient"] = config.get('DEFAULT','MqttClient')
-    return settings
 
 #Delete Resource
 def delete_resource_method(resource):
@@ -69,8 +56,8 @@ def delete_device_method(device):
 @login_required
 def device_index():
     """ Devices Index Section"""
-    devices = Device.query.filter_by(device_parent=None)
-    settings = get_config_values()
+    devices = Device.query.filter(Device.device_parent==1)
+    settings = sc.get_config_values()
     return render_template('device/device_index.html', devices=devices,settings=settings)
 
 #Device Detail View
@@ -128,7 +115,7 @@ def create():
                 if device_parent != "null":
                     device = Device(name=name, description=description,categories = categories_instances, is_gateway=is_gateway, create_at = create_at, update_at=update_at, device_parent=device_parent)
                 else:
-                    device = Device(name=name, description=description, categories = categories_instances, is_gateway=is_gateway, create_at = create_at, update_at=update_at)
+                    device = Device(name=name, description=description, categories = categories_instances, is_gateway=is_gateway, create_at = create_at, update_at=update_at, device_parent=1)
                 db.session.add(device)
                 db.session.commit()
                 return redirect(url_for('device.device_index'))

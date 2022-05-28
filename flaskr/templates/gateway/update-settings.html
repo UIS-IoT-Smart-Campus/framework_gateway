@@ -60,32 +60,36 @@
             </select>
           </div>
           <div class="col">
-            <label for="backendip"><b>Backend IP</b></label>
-            <input type="text" class="form-control" id="backendip" name="backendip" value="{{settings['backendIp']}}">
+            <label for="backendurl"><b>Backend URL</b></label>
+            <input type="text" class="form-control" id="backendurl" name="backendurl" value="{{settings['backendurl']}}">
           </div>
           <div class="col">
             <label for="backendport"><b>Backend Port</b></label>
-            <input type="text" class="form-control" id="backendport" name="backendport" value="{{settings['backendPort']}}">
+            <input type="text" class="form-control" id="backendport" name="backendport" value="{{settings['backendport']}}">
           </div>
         </div>
         <div class="row">
           <div class="col">
-            <label for="brokerip"><b>Broker IP</b></label>
-            <input type="text" class="form-control" id="brokerip" name="brokerip" value="{{settings['brokerIp']}}">
+            <label for="brokerbackendurl"><b>Broker URL</b></label>
+            <input type="text" class="form-control" id="brokerbackendurl" name="brokerbackendurl" value="{{settings['brokerbackendurl']}}">
           </div>
           <div class="col">
-            <label for="brokerport"><b>Broker Port</b></label>
-            <input type="text" class="form-control" id="brokerport" name="brokerport" value="{{settings['brokerPort']}}">
+            <label for="brokerbackendport"><b>Broker Port</b></label>
+            <input type="text" class="form-control" id="brokerbackendport" name="brokerbackendport" value="{{settings['brokerbackendport']}}">
           </div>
           <div class="col">
-            <label for="backendtopic"><b>Backend Topic</b></label>
-            <input type="text" class="form-control" id="backendtopic" name="backendtopic" value="{{settings['backend_topic']}}">
+            <label for="brokerbackendtopic"><b>Broker Topic</b></label>
+            <input type="text" class="form-control" id="brokerbackendtopic" name="brokerbackendtopic" value="{{settings['brokerbackendtopic']}}">
           </div>
         </div>
         <div class="row">
           <div class="col-4">
-            <label for="mqttclientname"><b>MQTT Client Name</b></label>
-            <input type="text" class="form-control" id="mqttclientname" name="mqttclientname" value="{{settings['MqttClient']}}">
+            <label for="mqttclient"><b>MQTT Client Name</b></label>
+            <input type="text" class="form-control" id="mqttclient" name="mqttclient" value="{{settings['mqttclient']}}">
+          </div>
+          <div class="col-4">
+            <label for="backendgatewayid"><b>Gateway Backend ID</b></label>
+            <input type="text" class="form-control" id="backendgatewayid" name="backendgatewayid" value="{{settings['backendgatewayid']}}">
           </div>
         </div>     
       </div>
