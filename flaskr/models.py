@@ -36,7 +36,6 @@ class Device(db.Model):
     topics = db.relationship('Topic',secondary=device_topics, lazy='subquery',backref=db.backref('device',lazy=True))
     categories = db.relationship('Category',secondary=device_categories, lazy='subquery',backref=db.backref('device',lazy=True))
     is_gateway = db.Column(db.Boolean,default=False)
-    local_device = db.Column(db.Boolean,default=True)
     create_at = db.Column(db.Date)
     update_at = db.Column(db.Date)
     device_parent = db.Column(db.Integer, db.ForeignKey('device.id'))
@@ -50,19 +49,23 @@ class Device(db.Model):
            'name': self.name,
            'description': self.description,
            'device_parent': self.device_parent,
-           'local_device':self.local_device,
-           'topics': self.serializable_topics,
            'properties': self.serializable_properties,
-           'resources':self.serializable_resources
+           'resources':self.serializable_resources,
+           'devices':self.serializable_devices
        }
     
     @property
-    def serializable_topics(self):
-        """
-        Return topics relations serializable.
-        """
-        return [ topic.serializable for topic in self.topics]
-    
+    def get_gateway_serialize(self):
+       """Return object data in easily serializable format"""
+       return {
+           'name': self.name,
+           'description': self.description,
+           'gateway':self.is_gateway,
+           'properties':self.serializable_properties,
+           'resources':self.serializable_resources,
+           'devices':self.serializable_devices
+       }
+        
     @property
     def serializable_properties(self):
         """
@@ -78,6 +81,14 @@ class Device(db.Model):
         """
         resources = Resource.query.filter_by(device_id=self.id)
         return [resource.serializable for resource in resources]
+    
+    @property
+    def serializable_devices(self):
+        """
+        Return the devices of the device.
+        """
+        devices = Device.query.filter_by(device_parent=self.id)
+        return [device.serialize for device in devices]
 
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -112,6 +123,7 @@ class Resource(db.Model):
     @property
     def serialize(self):
         return {
+            'id':self.id,
             'name': self.name,
             'description': self.description,
             'type': self.resource_type,

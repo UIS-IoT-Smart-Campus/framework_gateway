@@ -431,36 +431,35 @@ Rest API Methods
 #########################
 # DEVICES API REST #####
 ########################
-#Get all devices
+
+#Get all devices except the gateway
 @bp.route('/api/', methods=["GET"])
 def get_devices_api():
-    return jsonify(devices=[i.serialize for i in Device.query.all()])
+    return jsonify(devices=[i.serialize for i in Device.query.filter(Device.id != 1).all()])
 
 #Get a single device
-@bp.route('/api/<tag>/', methods=["GET"])
-def get_device_api(tag):
-    device = Device.query.filter_by(tag=tag).first()
+@bp.route('/api/<id>/', methods=["GET"])
+def get_device_api(id):
+    device = Device.query.filter_by(id=id).first()
     return jsonify(device.serialize)
 
 #Create a Device
 @bp.route('/api/', methods=["POST"])
 def add_device_api():
     body = request.get_json()
-    if 'tag' not in body or 'name' not in body:
+    if 'name' not in body:
         error = {"Error":"No mandatory property is set."}
         return make_response(jsonify(error),400)
     else:
-        tag = body['tag']
-        name = body['name']
-    
+        name = body['name']    
         description = body.get('description',None)
+        backendid = body.get('backendid',None)
         device_parent = body.get('device_parent',None)
-        is_gateway = body.get('is_gateway',None)
-        ipv4_address = body.get('ipv4_address',None)
+        is_gateway = body.get('is_gateway',None)        
         properties = body.get('properties',None)
         resources = body.get('resources',None)
         
-        devices = Device.query.filter_by(tag=tag).first()
+        devices = Device.query.filter_by(id=id).first()
         if devices is not None:
             error = {"Error":"The device with this tag is already exist."}
             return make_response(jsonify(error),400)
@@ -469,6 +468,8 @@ def add_device_api():
             if device is None:
                 error = {"Error":"The parent device ID not exist."}
                 return make_response(jsonify(error),400)
+        else:
+            device_parent=1
         
         if properties:
             for proper in properties:
@@ -636,10 +637,10 @@ def get_data():
 def get_resources_api():
     return jsonify(resources=[i.serialize for i in Resource.query.all()])
 
-#Get specific Resource by tag
-@bp.route('resource/api/<tag>/', methods=["GET"])
-def get_resource_by_tag(tag):
-    resource = Resource.query.filter_by(tag=tag).first()
+#Get specific Resource by id
+@bp.route('resource/api/<id>/', methods=["GET"])
+def get_resource_by_id(id):
+    resource = Resource.query.filter_by(id=id).first()
     if resource is not None:
         return jsonify(resource.serialize)
     else:
@@ -647,31 +648,24 @@ def get_resource_by_tag(tag):
         return make_response(jsonify(error),400)
 
 
-
 #Create a Resource
 @bp.route('/resource/api/', methods=["POST"])
 def add_resource_api():
     body = request.get_json()
-    if 'tag' not in body or 'name' not in body or 'resource_type' not in body or 'device_id' not in body:
+    if 'name' not in body or 'resource_type' not in body or 'device_id' not in body:
         error = {"Error":"No mandatory property is set."}
         return make_response(jsonify(error),400)
     else:
-        tag = body['tag']
         name = body['name']
         resource_type = body['resource_type']
         device_id = body['device_id']          
         description = body.get('description',None)
         properties = body.get('properties',None)
         
-        resource = Resource.query.filter_by(tag=tag).first()
-        if resource is not None:
-            error = {"Error":"The Resource with this tag is already exist."}
+        device = Device.query.filter_by(id=device_id)
+        if device is None:
+            error = {"Error":"The parent device ID not exist."}
             return make_response(jsonify(error),400)
-        if device_id is not None:
-            device = Device.query.filter_by(id=device_id)
-            if device is None:
-                error = {"Error":"The parent device ID not exist."}
-                return make_response(jsonify(error),400)
         
         if properties:
             for proper in properties:
@@ -680,7 +674,7 @@ def add_resource_api():
                     error = {"Error":"The properties doesn't have the mandatory attributes."}
                     return make_response(jsonify(error),400)
         
-        resource = Resource(tag=tag,name=name,description=description,resource_type=resource_type,device_id=device_id)
+        resource = Resource(name=name,description=description,resource_type=resource_type,device_id=device_id)
         db.session.add(resource)
         db.session.commit()
 
@@ -697,10 +691,10 @@ def add_resource_api():
 
 
 
-#Update device
-@bp.route('/resource/api/<tag>/', methods=["PUT"])
-def update_resource_api(tag):
-    resource = Resource.query.filter_by(tag=tag).first()
+#Update resource
+@bp.route('/resource/api/<id>/', methods=["PUT"])
+def update_resource_api(id):
+    resource = Resource.query.filter_by(id=id).first()
     
     if resource is not None:
         body = request.get_json()
@@ -756,9 +750,9 @@ def update_resource_api(tag):
 
 
 #Delete Resource
-@bp.route('/resource/api/<tag>/', methods=["DELETE"])
-def delete_resource_api(tag):
-    resource = Resource.query.filter_by(tag=tag).first()
+@bp.route('/resource/api/<id>/', methods=["DELETE"])
+def delete_resource_api(id):
+    resource = Resource.query.filter_by(id=id).first()
     try:
         delete_resource_method(resource)
         return make_response(jsonify({"Delete":"The resource was remove"}),200)

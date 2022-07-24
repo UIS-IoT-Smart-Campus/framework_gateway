@@ -19,10 +19,10 @@ port = 1883
 topic = "device/data"
 client_id = 'python-mqtt-A001'
 #Message Parameter
-id = 3
+id = 2
 msg_topic = "temp_lebrija"
 content = {"temp":0,"feels_like":0,"pressure":0,"humidity":0}
-delay_time = 3600
+delay_time = 60
 
 # username = 'emqx'
 # password = 'public'
@@ -86,7 +86,7 @@ def publish(client):
             status = result[0]
             if status == 0:
                 pass
-                #print(f"Send `{msg}` to topic `{topic}`")
+                print(f"Send `{msg}` to topic `{topic}`")
             else:
                 pass
                 #print(f"Failed to send message to topic {topic}")

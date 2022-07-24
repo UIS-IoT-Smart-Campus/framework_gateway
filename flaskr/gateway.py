@@ -45,6 +45,12 @@ def delete_info():
     db.session.query(Category).delete()
     db.session.commit()
 
+def get_self_description(settings):
+    this_gateway = {}
+    device = Device.query.filter_by(id=1).first()
+    return device.get_gateway_serialize
+
+
 
 def disable_standalone():
     #Update internal Settings
@@ -95,15 +101,23 @@ def create_json_respresentation(json_response,device_parent):
 
 
 def synchronized_gateway(settings):
-    id = str(settings["gatewayId"])
-    backend_ip = settings["backendip"]
+    id = str(settings["backendgatewayid"])
+    backend_ip = settings["backendurl"]
     backend_port = settings["backendport"]
     api_url = "http://"+backend_ip+":"+backend_port+"/device/"+id
     response = rq.get(api_url)
     #Create self-representation
     create_json_respresentation(response.json(),device_parent=0)
 
-
+def set_representation(settings):
+    backend_url = settings["backendurl"]
+    backend_port = settings["backendport"]
+    api_url = "http://"+backend_url+":"+str(backend_port)+"/device"
+    this_gateway_obj = get_self_description(settings)
+    response = json.loads(rq.post(api_url,json=this_gateway_obj).text)
+    print(response)
+    settings["backendgatewayid"] = response["id"]
+    sc.set_config_values(settings)
 
 
 
@@ -120,9 +134,13 @@ def settings():
         if request.form.get('disablestandalone',False):
             disable_standalone()
             return render_template('index.html')
-        elif request.form.get('synchronized',False):
-            settings = get_config_values()
+        elif request.form.get('getrepresentation',False):
+            settings = sc.get_config_values()
             synchronized_gateway(settings)
+            return render_template('gateway/settings.html',settings=settings)
+        elif request.form.get('setrepresentation',False):
+            settings = sc.get_config_values()
+            set_representation(settings)
             return render_template('gateway/settings.html',settings=settings)
             
     else:
