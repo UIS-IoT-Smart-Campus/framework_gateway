@@ -4,7 +4,6 @@ from flask import (
 )
 from sqlalchemy import update
 
-
 from werkzeug.exceptions import abort
 
 from auth import login_required
@@ -69,7 +68,14 @@ def device_view(id):
     properties = Property.query.filter_by(device_id=id)
     resources = Resource.query.filter_by(device_id=id)
     offspring_devices = Device.query.filter_by(device_parent=device.id)
-    return render_template('device/device_detail.html', device=device,properties=properties,resources=resources,offspring_devices=offspring_devices)
+    if device.id:
+        db = TinyDB('device_data/'+str(device.id)+'/'+str(device.id)+'.json')
+        tables = db.tables()
+        data = {}
+        for table in tables:
+            data[table] = db.table(str(table)).all()
+
+    return render_template('device/device_detail.html', device=device,properties=properties,resources=resources,offspring_devices=offspring_devices,tables=tables,data=data)
 
 
 #Create Device
@@ -451,6 +457,7 @@ def add_device_api():
         error = {"Error":"No mandatory property is set."}
         return make_response(jsonify(error),400)
     else:
+        
         name = body['name']    
         description = body.get('description',None)
         backendid = body.get('backendid',None)
@@ -505,7 +512,16 @@ def add_device_api():
                     resource_d = Resource(name=resource["name"],description=resource["description"],resource_type=resource["resource_type"],device_id=device.id)
                 db.session.add(resource_d)
         
-        db.session.commit()        
+        db.session.commit()
+
+        #create directory for data
+        try:
+            directory = "device_data/"+str(device.id)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+        except OSError as e:
+            flash("Creation of the directory %s failed" % count_dev_str)
+        
         return jsonify(device.serialize)
 
 #Update device

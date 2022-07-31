@@ -19,7 +19,7 @@ port = 1883
 topic = "device/data"
 client_id = 'python-mqtt-A001'
 #Message Parameter
-id = 2
+id = 3
 msg_topic = "temp_lebrija"
 content = {"temp":0,"feels_like":0,"pressure":0,"humidity":0}
 delay_time = 60

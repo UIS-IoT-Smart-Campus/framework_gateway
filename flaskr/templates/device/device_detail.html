@@ -67,11 +67,14 @@
         <button class="nav-link" id="properties-tab" data-bs-toggle="tab" data-bs-target="#properties" type="button" role="tab" aria-controls="properties" aria-selected="false">Properties</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="subdevices-tab" data-bs-toggle="tab" data-bs-target="#subdevices" type="button" role="tab" aria-controls="subdevices" aria-selected="false">Devices</button>
+        <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button" role="tab" aria-controls="data" aria-selected="false">Data</button>
       </li>
       <li class="nav-item" role="presentation">
+        <button class="nav-link" id="subdevices-tab" data-bs-toggle="tab" data-bs-target="#subdevices" type="button" role="tab" aria-controls="subdevices" aria-selected="false">Devices</button>
+      </li>      
+      <li class="nav-item" role="presentation">
         <button class="nav-link" id="resources-tab" data-bs-toggle="tab" data-bs-target="#resources" type="button" role="tab" aria-controls="resources" aria-selected="false">Resources</button>
-      </li>
+      </li>      
     </ul>
     <div class="tab-content" id="myTabContent">
       <div class="tab-pane fade show active" id="summary" role="tabpanel" aria-labelledby="summary-tab">
@@ -138,6 +141,31 @@
                   </table>      
             </div>
       </div>
+      <div class="tab-pane fade" id="data" role="tabpanel" aria-labelledby="data-tab">
+        </br>
+        <div class="row">
+            <div class="col-sm">
+                {% if data %}
+                  {%for table in tables %}
+                    <h4>{{table}}</h4>
+                    <div class="overflow-auto" style="height: 60vh;">               
+                      {%for dat in data[table] %}
+                      <ul class="list-group">
+                        {% for key in dat %}
+                          <li class="list-group-item"><b>{{key}}:</b> {{dat[key]}}</li>
+                        {% endfor %}
+                      </ul>
+                      </br>               
+                      {% endfor %}
+                      </ul>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                <p>This devices don't have data</p>
+                {% endif %}                                
+            </div>
+      </div>
+      </div>
       <div class="tab-pane fade" id="subdevices" role="tabpanel" aria-labelledby="subdevices-tab">
         </br>
         <div class="row">
@@ -163,31 +191,32 @@
         </div>
       </div>
       <div class="tab-pane fade" id="resources" role="tabpanel" aria-labelledby="resources-tab">
-      </br>
-      <div class="row">
-          <div class="col-sm">
-              <h5>Resources</h5>
-              <a class="btn btn-success btn-sm" href="{{ url_for('device.create_resource', id=device['id']) }}" role="button">Add</a>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for resource in resources %}
-                  <tr>
-                    <td>{{ resource['name'] }}</td>
-                    <td>{{ resource['resource_type'] }}</td>
-                    <td><a class="btn btn-primary btn-sm" href="{{ url_for('device.resource_view', id=resource['id'] ) }}" role="button">Details</a></td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-          </div>
+        </br>
+        <div class="row">
+            <div class="col-sm">
+                <h5>Resources</h5>
+                <a class="btn btn-success btn-sm" href="{{ url_for('device.create_resource', id=device['id']) }}" role="button">Add</a>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Name</th>
+                      <th scope="col">Type</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for resource in resources %}
+                    <tr>
+                      <td>{{ resource['name'] }}</td>
+                      <td>{{ resource['resource_type'] }}</td>
+                      <td><a class="btn btn-primary btn-sm" href="{{ url_for('device.resource_view', id=resource['id'] ) }}" role="button">Details</a></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+            </div>
+        </div>
       </div>
-    </div>
-  </div>  
+      
+    </div>  
 </div>
 {% endblock %}

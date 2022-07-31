@@ -12,12 +12,25 @@ from models import Device,Resource
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 def add_device(device,nodes,links,parent_node, nodes_count):
+    print("device")
+    print(device.id)
+    print("nodes")
+    print(nodes)
+    print("links")
+    print(links)
     #Agregar nodo dispositivo
-    node = {"name":device.name,"type":"Device"}
+    if device.is_gateway:
+        node = {"name":device.name,"type":"Gateway"}
+    else:
+        node = {"name":device.name,"type":"Device"}
     nodes.append(node)
-    nodes_count+=1
+
+    if device.id != 1:
+        nodes_count+=1
+        links.append({"source":parent_node,"target":nodes_count})
+    
     device_node = nodes_count
-    links.append({"source":parent_node,"target":nodes_count})
+    
     #Agregar recursos dispositivo
     resources = Resource.query.filter_by(device_id=device.id)
     for resource in resources:
@@ -46,11 +59,13 @@ def index():
     parent_node = 0
 
     #Add self-node
-    node = {"name":"Gateway","type":"Gateway"}
-    nodes.append(node)
+    #node = {"name":"Gateway","type":"Gateway"}
+    #nodes.append(node)
 
     devices = Device.query.filter_by(device_parent=None)
     for device in devices:
-        nodes_count = add_device(device,nodes,links,parent_node,nodes_count)             
+        nodes_count = add_device(device,nodes,links,parent_node,nodes_count) 
+
+    print(nodes_count)           
 
     return render_template('dashboard/index.html', nodes = nodes, links = links)
