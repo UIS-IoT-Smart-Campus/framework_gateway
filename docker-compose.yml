@@ -10,18 +10,18 @@ services:
     networks:
       - iot_network
     volumes:
-      - ./flaskr/mosquitto.conf:/mosquitto/config/mosquitto.conf
-  #gatewayframework:
-    #container_name: gatewayframework
-    #depends_on:
-    #  - broker
-    # build: .
-    # environment:
-    #     BROKERURL: broker
-    # ports:
-    #   - 5000:5000
-    # networks:
-    #   - iot_network    
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+  gatewayframework:
+    container_name: gatewayframework
+    depends_on:
+      - broker
+    build: .
+    environment:
+      BROKERURL: broker
+    ports:
+      - 5000:5000
+    networks:
+      - iot_network    
       
 networks: 
   iot_network:

@@ -12,19 +12,26 @@ import selfconfig as sc
 #Initial configuration
 test_config = None
 
+settings = sc.get_config_values()
+
+try:
+    broker_url = os.environ.get('BROKERURL', settings["devicebrokerurl"])
+except:
+    broker_url = settings["devicebrokerurl"]
+
 #Create and configure the app
 app = Flask(__name__, instance_relative_config=True)
 
 #DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
 
-settings = sc.get_config_values()
+
 
 #Set app configuration
 app.config.from_mapping(
     SECRET_KEY='dev',
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
     SQLALCHEMY_DATABASE_URI='sqlite:///instance/db.sqlite3',    
-    MQTT_BROKER_URL= settings["devicebrokerurl"],
+    MQTT_BROKER_URL= broker_url,
     MQTT_BROKER_PORT= settings["devicebrokerport"],
     MQTT_KEEPALIVE=settings["mqttkeepalive"],
 )

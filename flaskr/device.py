@@ -459,9 +459,9 @@ def add_device_api():
         properties = body.get('properties',None)
         resources = body.get('resources',None)
         
-        devices = Device.query.filter_by(id=id).first()
+        devices = Device.query.filter_by(name=name).first()
         if devices is not None:
-            error = {"Error":"The device with this tag is already exist."}
+            error = {"Error":"The device with this name is already exist."}
             return make_response(jsonify(error),400)
         if device_parent is not None:
             device = Device.query.filter_by(id=device_parent)
@@ -485,7 +485,7 @@ def add_device_api():
                     error = {"Error":"The resources doesn't have the mandatory attributes."}
                     return make_response(jsonify(error),400)
 
-        device = Device(tag=tag,name=name,description=description,ipv4_address=ipv4_address,is_gateway=is_gateway,device_parent=device_parent)
+        device = Device(name=name,description=description,is_gateway=is_gateway,device_parent=device_parent)
         db.session.add(device)
         db.session.commit()
 
@@ -500,18 +500,18 @@ def add_device_api():
         if resources:
             for resource in resources:
                 if "description" not in list(resource.keys()):
-                    resource_d = Resource(tag=resource["tag"],name=resource["name"],resource_type=resource["resource_type"],device_id=device.id)
+                    resource_d = Resource(name=resource["name"],resource_type=resource["resource_type"],device_id=device.id)
                 else:
-                    resource_d = Resource(tag=resource["tag"],name=resource["name"],description=resource["description"],resource_type=resource["resource_type"],device_id=device.id)
+                    resource_d = Resource(name=resource["name"],description=resource["description"],resource_type=resource["resource_type"],device_id=device.id)
                 db.session.add(resource_d)
         
         db.session.commit()        
         return jsonify(device.serialize)
 
 #Update device
-@bp.route('/api/<tag>/', methods=["PUT"])
-def update_device_api(tag):
-    device = Device.query.filter_by(tag=tag).first()
+@bp.route('/api/<id>/', methods=["PUT"])
+def update_device_api(id):
+    device = Device.query.filter_by(id=id).first()
     
     if device is not None:
         body = request.get_json()
@@ -523,7 +523,6 @@ def update_device_api(tag):
         description = body.get('description',None)
         device_parent = body.get('device_parent',None)
         is_gateway = body.get('is_gateway',None)
-        ipv4_address = body.get('ipv4_address',None)
         properties = body.get('properties',None)
         resources = body.get('resources',None)
 
@@ -537,8 +536,6 @@ def update_device_api(tag):
             device.device_parent = device_parent
         if is_gateway is not None:
             device.is_gateway = is_gateway
-        if ipv4_address:
-            device.ipv4_address = ipv4_address
         if properties:            
             for proper in properties:
                 keys_list = list(proper.keys())
@@ -553,7 +550,7 @@ def update_device_api(tag):
                 if "tag" not in keys_list or "name" not in keys_list or "resource_type" not in keys_list:
                     error = {"Error":"The resources doesn't have the mandatory attributes."}
                     return make_response(jsonify(error),400)
-                resource_i = Resource(tag=resource["tag"],name=resource.get("name",None),resource_type=resource.get("resource_type",None))
+                resource_i = Resource(name=resource.get("name",None),resource_type=resource.get("resource_type",None))
                 resources_list.append(resource_i)
 
         
@@ -575,7 +572,7 @@ def update_device_api(tag):
 
         if len(resources_list)>0:
             for new_resource in resources_list:
-                resource = Resource.query.filter_by(device_id=device.id,tag=new_resource.tag).first()                
+                resource = Resource.query.filter_by(device_id=device.id).first()                
                 if resource is not None:
                     print("entro aquí")
                     resource.name = new_resource.name
@@ -598,9 +595,9 @@ def update_device_api(tag):
 
     
 #Delete device
-@bp.route('/api/<tag>/', methods=["DELETE"])
-def delete_device_api(tag):
-    device = Device.query.filter_by(tag=tag).first()
+@bp.route('/api/<id>/', methods=["DELETE"])
+def delete_device_api(id):
+    device = Device.query.filter_by(id=id).first()
     try:
         delete_device_method(device)
         return make_response(jsonify({"Delete":"The device was remove"}),200)
@@ -614,10 +611,10 @@ def delete_device_api(tag):
 @bp.route('/get_data', methods=('GET', 'POST'))
 #@login_required
 def get_data():
-    device_tag = request.args.get('device_tag',None)
-    table = request.args.get('device_table',None)
-    if device_tag and table:
-        dbn = TinyDB('device_data/'+str(device_tag)+'/'+str(device_tag)+'.json')
+    device_id = request.args.get('device_id',None)
+    table = request.args.get('table',None)
+    if device_id and table:
+        dbn = TinyDB('device_data/'+str(device_id)+'/'+str(device_id)+'.json')
         #data = json.load(db.all())
         table = dbn.table(str(table))
         data = table.all()
