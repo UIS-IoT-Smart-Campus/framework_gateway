@@ -6,7 +6,7 @@ from requests import patch
 from werkzeug.exceptions import abort
 
 from auth import login_required
-from models import Device, Property, Resource,Category
+from models import Device, Property, Resource
 from persistence import Persistence
 from app import db
 
@@ -41,8 +41,6 @@ def delete_info():
     db.session.query(Resource).delete()
     db.session.commit()
     db.session.query(Device).delete()
-    db.session.commit()
-    db.session.query(Category).delete()
     db.session.commit()
 
 def get_self_description(settings):
@@ -115,9 +113,25 @@ def set_representation(settings):
     api_url = "http://"+backend_url+":"+str(backend_port)+"/device"
     this_gateway_obj = get_self_description(settings)
     response = json.loads(rq.post(api_url,json=this_gateway_obj).text)
-    print(response)
+    #Actualizar configuración interna
     settings["backendgatewayid"] = response["id"]
     sc.set_config_values(settings)
+    #Actualizar ID Globales.
+    this_gateway = Device.query.filter_by(id=1).first()
+    this_gateway.backend_ip = response["id"]
+    db.session.add(this_gateway)
+    db.session.commit()
+    #Actualizar id globales propiedades
+    backend_properties = response["properties"]
+    properties = Property.query.filter_by(device_id=1)
+    for prop in properties:
+        for b_prop in backend_properties:
+            if prop.name == b_prop['name']:
+                prop.global_id = b_prop['id']
+                db.session.add(prop)
+                db.session.commit()
+        
+
 
 
 

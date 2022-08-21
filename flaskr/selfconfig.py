@@ -19,7 +19,8 @@ def get_config_values() -> dict:
     settings["brokerbackendurl"] = config.get('nostandalone.config','brokerbackendurl')
     settings["brokerbackendport"] = config.get('nostandalone.config','brokerbackendport')
     settings["brokerbackendtopic"] = config.get('nostandalone.config','brokerbackendtopic')
-    settings["backendgatewayid"] = config.getint('nostandalone.config','backendgatewayid')
+    settings["global_id"] = config.getint('nostandalone.config','global_id')
+    settings["gateway_ipv4"] = config.get('nostandalone.config','gateway_ipv4')
 
     return settings
 
@@ -44,7 +45,8 @@ def set_config_values(settings):
         'brokerbackendurl',
         'brokerbackendport',
         'brokerbackendtopic',
-        'backendgatewayid'
+        'global_id',
+        'gateway_ipv4'
     ]
 
     if 'standalone' in settings:

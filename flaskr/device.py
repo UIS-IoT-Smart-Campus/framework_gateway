@@ -1,4 +1,3 @@
-import re
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
@@ -7,7 +6,7 @@ from sqlalchemy import update
 from werkzeug.exceptions import abort
 
 from auth import login_required
-from models import Category, Device,Property,Resource
+from models import Device,Property,Resource
 from datetime import date
 
 from flask import request,Response,make_response
@@ -18,7 +17,6 @@ from app import db
 
 import os
 import shutil
-import configparser
 import selfconfig as sc
 
 bp = Blueprint('device', __name__, url_prefix='/device')
@@ -83,7 +81,6 @@ def device_view(id):
 @login_required
 def create():
     devices = db.session.query(Device).all()
-    categories = db.session.query(Category).all()
 
     """View for create devices"""
     if request.method == 'POST':
@@ -91,7 +88,6 @@ def create():
         name = request.form['name']
         description = request.form['description']
         is_gateway = request.form.get('is_gateway',False)
-        categories = request.form.getlist('device_categories')
         device_parent = request.form['device_parent']
         create_at = update_at = date.today()
         error = None
@@ -107,21 +103,17 @@ def create():
         else:            
             try:
                 if len(devices)!=0:
-                    count_dev_str = str(devices[len(devices)-1].id+1)
+                    count_dev = devices[len(devices)-1].id+1
                 else:
-                    count_dev_str = "1"
-                directory = "device_data/"+count_dev_str
+                    count_dev = 1
+                directory = "device_data/"+str(count_dev)
                 if not os.path.exists(directory):
                     os.makedirs(directory)
-                categories_instances = []
-                if categories:                    
-                    for category in categories:
-                        cat_ins = Category.query.filter_by(id=category).first()
-                        categories_instances.append(cat_ins)
+                categories_instances = []                
                 if device_parent != "null":
-                    device = Device(name=name, description=description,categories = categories_instances, is_gateway=is_gateway, create_at = create_at, update_at=update_at, device_parent=device_parent)
+                    device = Device(name=name, description=description,global_id=count_dev, is_gateway=is_gateway, create_at = create_at, update_at=update_at, device_parent=device_parent)
                 else:
-                    device = Device(name=name, description=description, categories = categories_instances, is_gateway=is_gateway, create_at = create_at, update_at=update_at, device_parent=1)
+                    device = Device(name=name, description=description,global_id=count_dev, is_gateway=is_gateway, create_at = create_at, update_at=update_at, device_parent=1)
                 db.session.add(device)
                 db.session.commit()
                 return redirect(url_for('device.device_index'))
@@ -132,35 +124,7 @@ def create():
                 print(e)
                 flash("DB Creation Failed")
 
-    return render_template('device/create.html',devices=devices, categories = categories)
-
-#Create Category
-@bp.route('/create_category', methods=('GET', 'POST'))
-@login_required
-def create_category():
-    """View for create categories"""
-    if request.method == 'POST':
-        name = request.form['name']        
-        description = request.form['description']
-        error = None
-
-        if not name:
-            error = 'No mandatory property is set.'  
-
-        if error is not None:
-            flash(error)
-        else:            
-            try:
-                category = Category(name=name, description=description)                
-                db.session.add(category)
-                db.session.commit()
-                return redirect(url_for('device.device_index'))
-
-            except Exception as e:
-                flash("DB Creation Failed")
-
-    return render_template('device/create_category.html')
-
+    return render_template('device/create.html',devices=devices)
 
 #Edit Device
 @bp.route('/edit_device/<int:id>', methods=('GET', 'POST'))
@@ -362,7 +326,12 @@ def create_resource(id):
             flash(error)
         else:            
             try:
-                resource_d = Resource(name=r_name, description=r_description, resource_type=r_type,device_id=device_id)
+                last_resource = db.session.query(Resource).order_by(Resource.id.desc()).first()
+                if last_resource != None:
+                    last_resource_id = last_resource.id+1
+                else:
+                    last_resource_id = 1
+                resource_d = Resource(name=r_name, description=r_description,global_id = last_resource_id, resource_type=r_type,device_id=device_id)
                 db.session.add(resource_d)
                 db.session.commit()
                 return redirect(url_for('device.device_view',id=device.id))
@@ -370,6 +339,7 @@ def create_resource(id):
             except OSError as e:
                 flash("Creation of the directory %s failed" % e)
             except Exception as e:
+                print(e)
                 flash("DB Creation Failed")
 
     return render_template('device/create_resource.html',device=device)
@@ -460,7 +430,7 @@ def add_device_api():
         
         name = body['name']    
         description = body.get('description',None)
-        backendid = body.get('backendid',None)
+        global_id = body.get('global_id',None)
         device_parent = body.get('device_parent',None)
         is_gateway = body.get('is_gateway',None)        
         properties = body.get('properties',None)
@@ -492,7 +462,7 @@ def add_device_api():
                     error = {"Error":"The resources doesn't have the mandatory attributes."}
                     return make_response(jsonify(error),400)
 
-        device = Device(name=name,description=description,is_gateway=is_gateway,device_parent=device_parent)
+        device = Device(name=name,description=description,global_id=global_id,is_gateway=is_gateway,device_parent=device_parent)
         db.session.add(device)
         db.session.commit()
 
@@ -772,4 +742,59 @@ def delete_resource_api(id):
 
     except Exception as e:
         error = {"Error":"It's not possible to delete the device"}
+        return make_response(jsonify(error),400)
+
+
+
+
+
+
+"""
+REMOTE ADMIN API REST
+"""
+
+
+"""----------------------------------------------------------------------------------------------
+#########################
+# REMOTE ADMIN DEVICE API REST #####
+########################
+--------------------------------------------------------------------------------------------"""
+
+
+
+"""----------------------------------------------------------------------------------------------
+#########################
+# REMOTE ADMIN PROPERTIES API REST #####
+########################
+--------------------------------------------------------------------------------------------"""
+
+
+#Update resource
+@bp.route('/property/api/<global_id>/', methods=["PUT"])
+def update_global_property(global_id):
+    prop = Property.query.filter_by(global_id=global_id).first()
+    
+    if prop is not None:
+        body = request.get_json()
+
+        #Get data from request
+        name = body.get('name',None)
+        value = body.get('value',None)
+        description = body.get('description',None)
+
+        #Set properties to model
+        if name:
+            prop.name = name
+        if value:
+            prop.value = value
+        if description:
+            prop.description = description
+                
+        db.session.add(prop)
+        db.session.commit()        
+                
+        return jsonify(prop.serialize)
+
+    else:
+        error = {"Error":"The property doesn't exist."}
         return make_response(jsonify(error),400)

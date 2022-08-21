@@ -69,6 +69,11 @@ import index
 app.register_blueprint(index.bp)
 app.add_url_rule('/', endpoint='index')
 
+#Registrar espacio de trabajo para aplicaciones
+import applications
+app.register_blueprint(applications.bp)
+app.add_url_rule('/apps', endpoint='index')
+
 #Registrar espacio de trabajo para devices
 import device
 app.register_blueprint(device.bp)

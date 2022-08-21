@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Devices{% endblock %}
+{% block title %}Applications{% endblock %}
 
-{% block header %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/devices.css') }}">
-{% endblock %}
 
 {% block menu %}
 <ul class="nav nav-pills flex-column mb-auto">
@@ -21,13 +18,13 @@
     </a>
   </li>
   <li>
-    <a href="{{ url_for('applications.applications_index') }}" class="nav-link text-white">
+    <a href="{{ url_for('dashboard.index') }}" class="nav-link active">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#tools"></use></svg>
       Apps
     </a>
   </li>
   <li>
-    <a href="{{ url_for('device.device_index') }}" class="nav-link active">
+    <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
       Devices
     </a>
@@ -53,43 +50,38 @@
 <div>
   <nav class="navbar title-nav">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Devices</span>
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#tools"></use></svg>Applications</span>
     </div>
   </nav>
   <div class="page-content">
-    <p>In this section you can create, modify and delete devices, check devices properties and status.</p>
+    <p>In this section you can create, modify and delete applications, check applications status.</p>
     <h3>Actions</h3>
     {% if settings['standalone'] %}
     <div class="device_actions">      
-      <a class="btn btn-success" href="{{ url_for('device.create') }}" role="button">Create Device</a>
+      <a class="btn btn-success" href="{{ url_for('applications.create_application') }}" role="button">Create Application</a>
     </div>
     {% endif %}
     </br>
-    <h3>Devices List</h3>
-    <div class="devices_list">
+    <h3>Aplications List</h3>
+    <div class="apps_list">
       <table class="table">
           <tr>
             <th>Id</th>
             <th>Name</th>
-            <th>Gateway</th>
             <th>Create</th>
-            <th>Last Update</th>
             <th>Details</th>
           </tr>
-          {% for device in devices %}
+          {% for app in applications %}
             <tr>
-              <td>{{ device['id'] }}</td>
-              <td>{{ device['name'] }}</td>
-              <td>{% if device['is_gateway'] %}<span class="badge bg-success">yes</span>{% endif %}</td>
-              <td>{{ device['create_at'] }}</td>
-              <td>{{ device['update_at'] }}</td>
-              <td><a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=device['id']) }}" role="button">Details</a></td>
+              <td>{{ app['id'] }}</td>
+              <td>{{ app['name'] }}</td>
+              <td>{{ app['create_at'] }}</td>
+              <td><a class="btn btn-success btn-sm" href="{{ url_for('applications.application_view', id=app['id']) }}" role="button">Details</a></td>
             </tr>
           {% endfor %}
         </table>
     </div>
   </div>
-    
 </div>
     
 {% endblock %}

@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 
 
-{% block title %}New Category{% endblock %}
-
+{% block title %}New Application{% endblock %}
 
 {% block menu %}
 <ul class="nav nav-pills flex-column mb-auto">
@@ -16,6 +15,12 @@
     <a href="{{ url_for('dashboard.index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
       Dashboard
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('applications.applications_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#tools"></use></svg>
+      Apps
     </a>
   </li>
   <li>
@@ -46,30 +51,25 @@
 <div>
   <nav class="navbar title-nav">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Categories</span>
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#tools"></use></svg>Applications</span>
     </div>
   </nav>
-  <div class="page-content">
-    <p>Then you can create a new local category.</p>
+  <div class="page-content">    
     <form method="post">
       <div class="container">
         <fieldset>
-          <legend>Create Category</legend>
+          <legend>Create Application</legend>
         <div class="row">
           <div class="col-sm form-group">
             <label for="name">Name</label>
             <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>
           </div>
-          <div class="col-sm ">
-            <label for="description">Description</label>
-            <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
-          </div>
-        </div>
+        </div>      
         </br>
         <div class="row">
           <div class="col-sm ">
-            <input type="submit" class="btn btn-success" value="Create Category">
-            <a class="btn btn-danger" href="{{ url_for('device.device_index') }}" role="button"> Cancel</a>
+            <input type="submit" class="btn btn-success" value="Create Application">
+            <a class="btn btn-danger" href="{{ url_for('applications.applications_index') }}" role="button"> Cancel</a>
           </div>
         </div>
       </div>

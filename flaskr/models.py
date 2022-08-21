@@ -12,29 +12,22 @@ device_topics = db.Table('device_topics',
     db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'), primary_key=True),
 )
 
-device_categories = db.Table('device_categories',
+apps_devices = db.Table('apps_devices',
+    db.Column('app_id', db.Integer, db.ForeignKey('application.id'), primary_key=True),
     db.Column('device_id', db.Integer, db.ForeignKey('device.id'), primary_key=True),
-    db.Column('category_id', db.Integer, db.ForeignKey('category.id'), primary_key=True),
 )
-
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
 
-class Category(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)    
-    description = db.Column(db.String(200))
-
 class Device(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    backendid = db.Column(db.Integer)
+    global_id = db.Column(db.Integer)
     name = db.Column(db.String(80), nullable=False)    
     description = db.Column(db.String(200))
     topics = db.relationship('Topic',secondary=device_topics, lazy='subquery',backref=db.backref('device',lazy=True))
-    categories = db.relationship('Category',secondary=device_categories, lazy='subquery',backref=db.backref('device',lazy=True))
     is_gateway = db.Column(db.Boolean,default=False)
     create_at = db.Column(db.Date)
     update_at = db.Column(db.Date)
@@ -45,10 +38,11 @@ class Device(db.Model):
        """Return object data in easily serializable format"""
        return {
            'id': self.id,
-           'backendid': self.backendid,
+           'global_id': self.global_id,
            'name': self.name,
            'description': self.description,
            'device_parent': self.device_parent,
+           'is_gateway': self.is_gateway,
            'properties': self.serializable_properties,
            'resources':self.serializable_resources,
            'devices':self.serializable_devices
@@ -90,6 +84,13 @@ class Device(db.Model):
         devices = Device.query.filter_by(device_parent=self.id)
         return [device.serialize for device in devices]
 
+class Application(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    global_id = db.Column(db.Integer)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    create_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    devices = db.relationship('Device',secondary=apps_devices, lazy='subquery',backref=db.backref('device',lazy=True))
+
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     topic = db.Column(db.String(80), unique=True, nullable=False)
@@ -106,7 +107,7 @@ class Topic(db.Model):
 
 class Resource(db.Model):
     id =  db.Column(db.Integer, primary_key=True)
-    backendid = db.Column(db.Integer)
+    global_id = db.Column(db.Integer)
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(200))
     resource_type = db.Column(db.String(80), nullable=False)
@@ -115,9 +116,11 @@ class Resource(db.Model):
     @property
     def serializable(self):
         return {
+            'global_id': self.global_id,
             'name': self.name,
             'description': self.description,
-            'type': self.resource_type
+            'type': self.resource_type,
+            'properties':self.serializable_properties
         }
     
     @property
@@ -142,7 +145,6 @@ class Resource(db.Model):
 
 class Property(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    backendid = db.Column(db.Integer)
     name = db.Column(db.String(80), nullable=False)
     value = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(200))
@@ -152,6 +154,15 @@ class Property(db.Model):
     @property
     def serializable(self):
         return {
+            'name': self.name,
+            'value': self.value,
+            'description': self.description,
+        }
+    
+    @property
+    def serialize(self):
+        return {
+            'id':self.id,
             'name': self.name,
             'value': self.value,
             'description': self.description

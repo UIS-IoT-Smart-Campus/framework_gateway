@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Application Detail{% endblock %}
+
+
+{% block menu %}
+<ul class="nav nav-pills flex-column mb-auto">
+  <li class="nav-item">
+    <a href="{{ url_for('index.index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+      Home
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('dashboard.index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+      Dashboard
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('applications.applications_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#tools"></use></svg>
+      Apps
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+      Devices
+    </a>
+  </li>  
+  <li>
+    <a href="{{ url_for('topic.topic_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+      Topics
+    </a>
+  </li>
+  <!--
+  <li>
+    <a href="#" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+      Users
+    </a>
+  </li>
+  -->
+</ul>
+{% endblock %}
+
+
+
+{% block content %}
+<div>
+  <nav class="navbar title-nav">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Applications</span>
+    </div>
+  </nav>
+  <div class="page-content">
+    <h2>Application {{ application.name }}</h2>
+    <div class="row">
+        <div class="col-sm">
+          <a class="btn btn-primary btn-sm" href="{{ url_for('applications.edit_application', id=application['id']) }}" role="button">Update App</a>
+          <a class="btn btn-danger btn-sm" href="{{ url_for('applications.delete_application', id=application['id']) }}" role="button">Delete App</a>
+        </div>
+    </div><br><br>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab" aria-controls="summary" aria-selected="true">Summary</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="subdevices-tab" data-bs-toggle="tab" data-bs-target="#subdevices" type="button" role="tab" aria-controls="subdevices" aria-selected="false">Devices</button>
+      </li>     
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="summary" role="tabpanel" aria-labelledby="summary-tab">
+        {% if application %}
+        <table class="table">
+            <br>
+            <tbody>
+            <tr>
+                <td><b>Global ID:</b></td>
+                <td>{{ application.global_id }}</td>
+              </tr>             
+              <tr>
+                <td><b>Name:</b></td>
+                <td>{{ application.name }}</td>
+              </tr>
+              <tr>
+                <td><b>Create at:</b></td>
+                <td>{{ application.create_at }}</td>
+              </tr>
+            </tbody>
+          </table>
+        {% endif %}
+      </div>
+      <div class="tab-pane fade" id="subdevices" role="tabpanel" aria-labelledby="subdevices-tab">
+        </br>
+        <div class="row">
+            <div class="col-sm">
+                <h5>Internal Devices</h5>                
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for off_device in offspring_devices%}
+                      <tr>
+                        <td>{{ off_device.name}}</td>
+                        <td><a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=off_device['id']) }}" role="button">details</a></td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>                  
+            </div>
+        </div>
+      </div>      
+    </div>  
+</div>
+{% endblock %}

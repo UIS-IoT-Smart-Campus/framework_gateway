@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}Edit App{% endblock %}
 
-{% block title %}Edit Device{% endblock %}
 
 {% block menu %}
 <ul class="nav nav-pills flex-column mb-auto">
@@ -46,48 +46,39 @@
 </ul>
 {% endblock %}
 
+
 {% block content %}
 <div>
   <nav class="navbar title-nav">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Devices</span>
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Applications</span>
     </div>
   </nav>
   <div class="page-content">
-    <p>Then you can edit the device general data.</p>
-    {% if device %}
+    <p>Then you can edit the application general data.</p>
+    {% if application %}
     <form method="post">
       <div class="container">
         <div class="row">          
           <div class="col-sm form-group">
-            <label for="name">Device Name</label>
-            <input name="name" id="name" class="form-control" value="{{device.name  }}" required>
-          </div>
-          <div class="col-sm ">
-            <label for="description">Device Description</label>
-            <textarea name="description" id="description" class="form-control">{{device.description }}</textarea>
+            <label for="name">Application Name</label>
+            <input name="name" id="name" class="form-control" value="{{application.name}}" required>
           </div>
         </div>
-      </br>
-        <div class="row">
-          <div class="col-sm form-group">            
-            <input name="is_gateway" id="is_gateway" class="form-check-input" type="checkbox" {% if device.is_gateway %}checked{% endif %}>
-            <label for="is_gateway">Is a Gateway</label>
-          </div>
-        </div>
-      </br>
+        </br>
         <div class="row">
           <div class="col-sm ">
-            <input type="submit" class="btn btn-warning" value="Save Device">
-            <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device.id ) }}" role="button"> Cancel</a>
+            <input type="submit" class="btn btn-warning" value="Save Application">
+            <a class="btn btn-danger" href="{{ url_for('applications.application_view', id=application.id ) }}" role="button"> Cancel</a>
           </div>
         </div>
       </div>
     </form>
     {% else %}
-    <h3>Device not found</h3>
+    <h3>Application not found</h3>
     {% endif %}
   </div>  
 </div>
 
 {% endblock %}
+

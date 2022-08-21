@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block title %}Device Detail{% endblock %}
 
 {% block menu %}
@@ -15,6 +14,12 @@
     <a href="{{ url_for('dashboard.index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
       Dashboard
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('applications.applications_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#tools"></use></svg>
+      Apps
     </a>
   </li>
   <li>
