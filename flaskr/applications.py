@@ -2,7 +2,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
 from auth import login_required
-from models import Application
+from models import Application,Device
 import selfconfig as sc
 from app import db
 from datetime import date
@@ -20,11 +20,20 @@ def applications_index():
     return render_template('applications/app_index.html', applications=applications,settings=settings)
 
 #Application Detail View
-@bp.route('/<int:id>/view', methods=['GET'])
+@bp.route('/<int:id>/view', methods=['GET', 'POST'])
 @login_required
 def application_view(id):
     """ Application View Section"""
     application = Application.query.filter_by(id=id).first()
+    if request.method == 'POST':
+        device_id = request.form.get('device_id',None)
+        if device_id is not None:
+            device = Device.query.filter_by(id=device_id).first()
+            if device is not None:
+                application.devices.append(device)
+                db.session.add(application)
+                db.session.commit()    
+                return redirect(url_for('applications.application_view',id = application.id))
     return render_template('applications/detail_app.html', application=application)
 
 

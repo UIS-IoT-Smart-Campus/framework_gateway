@@ -12,9 +12,15 @@ device_topics = db.Table('device_topics',
     db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'), primary_key=True),
 )
 
-apps_devices = db.Table('apps_devices',
-    db.Column('app_id', db.Integer, db.ForeignKey('application.id'), primary_key=True),
+device_resource = db.Table('device_resource',
     db.Column('device_id', db.Integer, db.ForeignKey('device.id'), primary_key=True),
+    db.Column('resource_id', db.Integer, db.ForeignKey('resource.id'), primary_key=True),
+)
+
+device_app = db.Table('device_app',
+    db.Column('device_id', db.Integer, db.ForeignKey('device.id'), primary_key=True),
+    db.Column('app_id', db.Integer, db.ForeignKey('application.id'), primary_key=True),
+    
 )
 
 class User(db.Model):
@@ -28,6 +34,8 @@ class Device(db.Model):
     name = db.Column(db.String(80), nullable=False)    
     description = db.Column(db.String(200))
     topics = db.relationship('Topic',secondary=device_topics, lazy='subquery',backref=db.backref('device',lazy=True))
+    applications = db.relationship('Application',secondary=device_app, lazy='subquery',back_populates="devices")
+    resources = db.relationship('Resource',secondary=device_resource, lazy='subquery',back_populates="devices")
     is_gateway = db.Column(db.Boolean,default=False)
     create_at = db.Column(db.Date)
     update_at = db.Column(db.Date)
@@ -43,6 +51,7 @@ class Device(db.Model):
            'description': self.description,
            'device_parent': self.device_parent,
            'is_gateway': self.is_gateway,
+           'applications': self.serializable_apps,
            'properties': self.serializable_properties,
            'resources':self.serializable_resources,
            'devices':self.serializable_devices
@@ -59,6 +68,13 @@ class Device(db.Model):
            'resources':self.serializable_resources,
            'devices':self.serializable_devices
        }
+    
+    @property
+    def serializable_apps(self):
+        """
+        Return the resources of the device.
+        """
+        return [app.serializable for app in self.applications]
         
     @property
     def serializable_properties(self):
@@ -73,8 +89,7 @@ class Device(db.Model):
         """
         Return the resources of the device.
         """
-        resources = Resource.query.filter_by(device_id=self.id)
-        return [resource.serializable for resource in resources]
+        return [resource.serializable for resource in self.resources]
     
     @property
     def serializable_devices(self):
@@ -89,7 +104,14 @@ class Application(db.Model):
     global_id = db.Column(db.Integer)
     name = db.Column(db.String(80), unique=True, nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    devices = db.relationship('Device',secondary=apps_devices, lazy='subquery',backref=db.backref('device',lazy=True))
+    devices = db.relationship('Device',secondary=device_app, lazy='subquery',back_populates="applications")
+
+    @property
+    def serializable(self):
+        return {
+            'global_id': self.global_id,
+            'name': self.name
+        }
 
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -111,7 +133,8 @@ class Resource(db.Model):
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(200))
     resource_type = db.Column(db.String(80), nullable=False)
-    device_id = db.Column(db.Integer, db.ForeignKey('device.id'))
+    create_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    devices = db.relationship('Device',secondary=device_resource, lazy='subquery',back_populates="resources")
 
     @property
     def serializable(self):
@@ -120,6 +143,7 @@ class Resource(db.Model):
             'name': self.name,
             'description': self.description,
             'type': self.resource_type,
+            'create':self.create_at,
             'properties':self.serializable_properties
         }
     
@@ -130,7 +154,6 @@ class Resource(db.Model):
             'name': self.name,
             'description': self.description,
             'type': self.resource_type,
-            'device_id':self.device_id,
             'properties':self.serializable_properties
         }
     

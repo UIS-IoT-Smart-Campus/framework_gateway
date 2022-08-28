@@ -18,9 +18,21 @@
     </a>
   </li>
   <li>
+    <a href="{{ url_for('applications.applications_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#tools"></use></svg>
+      Apps
+    </a>
+  </li>
+  <li>
     <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
       Devices
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('resource.resources_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#cpu-fill"></use></svg>
+      Resources
     </a>
   </li>  
   <li>
@@ -56,7 +68,7 @@
         <div class="row">
           <div class="col-sm ">
             <input type="submit" class="btn btn-danger" value="Delete Property">
-            {% if resource %}
+            {% if device %}
             <a class="btn btn-warning" href="{{ url_for('device.device_view', id=property.device_id ) }}" role="button"> Cancel</a>
             {% endif %}
             {% if resource %}

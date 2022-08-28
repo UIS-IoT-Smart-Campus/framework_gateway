@@ -21,9 +21,21 @@
     </a>
   </li>
   <li>
+    <a href="{{ url_for('applications.applications_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#tools"></use></svg>
+      Apps
+    </a>
+  </li>
+  <li>
     <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
       Devices
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('resource.resources_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#cpu-fill"></use></svg>
+      Resources
     </a>
   </li>  
   <li>

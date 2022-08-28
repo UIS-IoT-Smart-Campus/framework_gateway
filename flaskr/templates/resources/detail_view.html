@@ -57,7 +57,7 @@
 <div>
   <nav class="navbar title-nav">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Devices</span>
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Resources</span>
     </div>
   </nav>
   <div class="page-content">
@@ -65,9 +65,8 @@
     <div class="row">
       <h3>Actions</h3>
         <div class="col-sm">
-          <a class="btn btn-primary btn-sm" href="{{ url_for('device.edit_resource', id=resource.id ) }}" role="button">Update Resource</a>
-          <a class="btn btn-danger btn-sm" href="{{ url_for('device.delete_resource', id=resource.id ) }}" role="button">Delete Resource</a>
-          <a class="btn btn-success btn-sm" href="{{ url_for('device.device_view', id=resource.device_id) }}" role="button">Device Parent</a>
+          <a class="btn btn-primary btn-sm" href="{{ url_for('resource.update_resource', id=resource.id ) }}" role="button">Update Resource</a>
+          <a class="btn btn-danger btn-sm" href="{{ url_for('resource.delete_resource', id=resource.id ) }}" role="button">Delete Resource</a>
         </div>
     </div><br><br>
       <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -85,12 +84,36 @@
               <br>
               <tbody>
                 <tr>
+                  <td><b>ID:</b></td>
+                  <td>{{ resource.id }}</td>
+                </tr>
+                <tr>
+                  <td><b>Global Id:</b></td>
+                  <td>{{ resource.global_id }}</td>
+                </tr>
+                <tr>
                   <td><b>Resource Name:</b></td>
                   <td>{{ resource.name }}</td>
                 </tr>
                 <tr>
                   <td><b>Description:</b></td>
                   <td>{{ resource.description }}</td>
+                </tr>
+                <tr>
+                  <td><b>Type:</b></td>
+                  <td>
+                    {% if resource['resource_type']=="SENSOR" %}
+                    <span class="badge bg-success">sensor</span>
+                    {% elif resource['resource_type']=="ACTUATOR" %}
+                    <span class="badge bg-primary">actuator</span>
+                    {% elif resource['resource_type']=="COMMUNICATION" %}
+                    <span class="badge bg-warning">communication</span>
+                    {% elif resource['resource_type']=="STORAGE" %}
+                    <span class="badge bg-dark">storage</span>
+                    {% else %}
+                    <span class="badge bg-secondary">other</span>
+                    {% endif %}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -100,7 +123,7 @@
             <br>
             <div class="col-sm">
                   <h5>Resource Properties</h5>
-                  <a class="btn btn-success btn-sm" href="{{ url_for('device.create_property_resource', id=resource['id']) }}" role="button">Add</a>                
+                  <a class="btn btn-success btn-sm" href="{{ url_for('resource.create_property', id=resource['id']) }}" role="button">Add</a>                
                   <table class="table">
                       <thead>
                         <tr>
@@ -116,7 +139,7 @@
                           <td>{{ property['name'] }}</td>
                           <td>{{ property['value'] }}</td>
                           <td>{{ property['description'] }}</td>
-                          <td><a class="btn btn-danger btn-sm" href="{{ url_for('device.delete_property_resource', id=property['id'] ) }}" role="button">Delete</a></td>
+                          <td><a class="btn btn-danger btn-sm" href="{{ url_for('resource.delete_property', id=property['id'] ) }}" role="button">Delete</a></td>
                         </tr>
                         {% endfor %}
                       </tbody>

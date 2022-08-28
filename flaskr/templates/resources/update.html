@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}Edit Resource{% endblock %}
 
-{% block title %}New Property{% endblock %}
 
 {% block menu %}
 <ul class="nav nav-pills flex-column mb-auto">
@@ -52,45 +52,47 @@
 </ul>
 {% endblock %}
 
+
+
 {% block content %}
 <div>
   <nav class="navbar title-nav">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Devices</span>
+      <span class="navbar-brand mb-0 h1"><svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>Resources</span>
     </div>
   </nav>
   <div class="page-content">
-    <h1>Property</h1>
-    <p>Then you can create a new property.</p>
+    <h1>Resource</h1>
     <form method="post">
       <div class="container">
         <div class="row">
           <div class="col-sm form-group">
-            <label for="name">Property Name</label>
-            <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>
+            <label for="name">Resource Name</label>
+            <input name="name" id="name" class="form-control" value="{{ resource.name }}" required>
           </div>
           <div class="col-sm form-group">
-            <label for="value">Property Value</label>
-            <input name="value" id="value" class="form-control" value="{{ request.form['value'] }}" required>
+            <label for="type">Resource Type</label>
+            <select class="form-select" id="type" name="type" aria-label="Default select example">
+              <option value="SENSOR" {% if resource.resource_type == 'SENSOR' %}selected{% endif %}>SENSOR</option>
+              <option value="ACTUATOR" {% if resource.resource_type == 'ACTUATOR' %}selected{% endif %}>ACTUATOR</option>
+              <option value="COMMUNICATION" {% if resource.resource_type == 'COMMUNICATION' %}selected{% endif %}>COMMUNICATION</option>
+              <option value="STORAGE" {% if resource.resource_type == 'STORAGE' %}selected{% endif %}>STORAGE</option>
+              <option value="OTHER" {% if resource.resource_type == 'OTHER' %}selected{% endif %}>OTHER</option>
+            </select>
           </div>        
         </div>
       </br>
         <div class="row">
           <div class="col-sm ">
-            <label for="description">Property Description</label>
-            <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
+            <label for="description">Resource Description</label>
+            <textarea name="description" id="description" class="form-control">{{ resource.description }}</textarea>
           </div>
         </div>
       </br>
         <div class="row">
           <div class="col-sm ">
-            <input type="submit" class="btn btn-success" value="Create Property">
-            {% if device %}
-            <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device['id']) }}" role="button"> Cancel</a>
-            {% endif %}
-            {% if resource %}
-            <a class="btn btn-danger" href="{{ url_for('device.resource_view', id=resource['id']) }}" role="button"> Cancel</a>
-            {% endif %}
+            <input type="submit" class="btn btn-success" value="Save">
+            <a class="btn btn-danger" href="{{ url_for('resource.resource_view', id=resource.id) }}" role="button"> Cancel</a>
           </div>
         </div>
       </div>

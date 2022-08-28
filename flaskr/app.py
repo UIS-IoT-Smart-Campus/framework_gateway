@@ -79,7 +79,14 @@ import device
 app.register_blueprint(device.bp)
 app.add_url_rule('/device', endpoint='index')
 
-#Registrar espacio de trabajo para devices
+
+#Registrar espacio de trabajo para recursos
+import resources
+app.register_blueprint(resources.bp)
+app.add_url_rule('/resource', endpoint='index')
+
+
+#Registrar espacio de trabajo para topicos
 import topic
 app.register_blueprint(topic.bp)
 app.add_url_rule('/topic', endpoint='index')

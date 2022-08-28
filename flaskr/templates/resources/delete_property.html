@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}New Resource{% endblock %}
 
+{% block title %}Delete Property{% endblock %}
 
 {% block menu %}
 <ul class="nav nav-pills flex-column mb-auto">
@@ -18,9 +18,21 @@
     </a>
   </li>
   <li>
+    <a href="{{ url_for('applications.applications_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#tools"></use></svg>
+      Apps
+    </a>
+  </li>
+  <li>
     <a href="{{ url_for('device.device_index') }}" class="nav-link text-white">
       <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
       Devices
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('resource.resources_index') }}" class="nav-link text-white">
+      <svg class="bi me-2" width="16" height="16"><use xlink:href="#cpu-fill"></use></svg>
+      Resources
     </a>
   </li>  
   <li>
@@ -40,8 +52,6 @@
 </ul>
 {% endblock %}
 
-
-
 {% block content %}
 <div>
   <nav class="navbar title-nav">
@@ -50,39 +60,19 @@
     </div>
   </nav>
   <div class="page-content">
-    <h1>Resource</h1>
-    <p>Then you can create a new Resource.</p>
+    <h1>Delete Property</h1>
+    <h4>¿Are you sure to remove the property with name: {{ property.name }}?</h4><br>
+    <p><b>Warning:</b>The delete action is irreversible.</p>
     <form method="post">
       <div class="container">
-        <div class="row">          
-          <div class="col-sm form-group">
-            <label for="name">Resource Name</label>
-            <input name="name" id="name" class="form-control" value="{{ request.form['name'] }}" required>
-          </div>
-          <div class="col-sm form-group">
-            <label for="type">Resource Type</label>
-            <select class="form-select" id="type" name="type" aria-label="Default select example">
-              <option value="SENSOR" selected>SENSOR</option>
-              <option value="ACTUATOR">ACTUATOR</option>
-            </select>
-          </div>        
-        </div>
-      </br>
         <div class="row">
           <div class="col-sm ">
-            <label for="description">Resource Description</label>
-            <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
-          </div>
-        </div>
-      </br>
-        <div class="row">
-          <div class="col-sm ">
-            <input type="submit" class="btn btn-success" value="Create Resource">
-            <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device['id']) }}" role="button"> Cancel</a>
+            <input type="submit" class="btn btn-danger" value="Delete Property">
+            <a class="btn btn-warning" href="{{ url_for('resource.resource_view', id=property.resource_id ) }}" role="button"> Cancel</a>
           </div>
         </div>
       </div>
-    </form>
+    </form>    
   </div>  
 </div>
 

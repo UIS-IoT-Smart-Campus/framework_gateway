@@ -58,22 +58,31 @@ def device_index():
     return render_template('device/device_index.html', devices=devices,settings=settings)
 
 #Device Detail View
-@bp.route('/<int:id>/view', methods=['GET'])
+@bp.route('/<int:id>/view', methods=['GET','POST'])
 @login_required
 def device_view(id):
     """ Devices View Section"""
     device = Device.query.filter_by(id=id).first()
-    properties = Property.query.filter_by(device_id=id)
-    resources = Resource.query.filter_by(device_id=id)
-    offspring_devices = Device.query.filter_by(device_parent=device.id)
-    if device.id:
-        db = TinyDB('device_data/'+str(device.id)+'/'+str(device.id)+'.json')
-        tables = db.tables()
-        data = {}
-        for table in tables:
-            data[table] = db.table(str(table)).all()
+    if request.method == 'POST':
+        resource_id = request.form.get('resource_id',None)
+        if resource_id is not None:
+            resource = Resource.query.filter_by(id=resource_id).first()
+            if resource is not None:
+                device.resources.append(resource)
+                db.session.add(device)
+                db.session.commit()    
+                return redirect(url_for('device.device_view',id = device.id))
+    else:
+        properties = Property.query.filter_by(device_id=id)
+        offspring_devices = Device.query.filter_by(device_parent=device.id)
+        if device.id:
+            dbj = TinyDB('device_data/'+str(device.id)+'/'+str(device.id)+'.json')
+            tables = dbj.tables()
+            data = {}
+            for table in tables:
+                data[table] = dbj.table(str(table)).all()
 
-    return render_template('device/device_detail.html', device=device,properties=properties,resources=resources,offspring_devices=offspring_devices,tables=tables,data=data)
+        return render_template('device/device_detail.html', device=device,properties=properties,offspring_devices=offspring_devices,tables=tables,data=data)
 
 
 #Create Device
@@ -119,7 +128,7 @@ def create():
                 return redirect(url_for('device.device_index'))
 
             except OSError as e:
-                flash("Creation of the directory %s failed" % count_dev_str)
+                flash("Creation of the directory failed")
             except Exception as e:
                 print(e)
                 flash("DB Creation Failed")
@@ -216,40 +225,6 @@ def create_property(id):
     return render_template('device/create_property.html',device=device)
 
 
-#Create Property Resource
-@bp.route('/add_property_resource/<int:id>', methods=('GET', 'POST'))
-@login_required
-def create_property_resource(id):
-    resource = Resource.query.filter_by(id=id).first()
-    """View for create properties"""
-    if request.method == 'POST':
-
-        p_name = request.form['name']
-        p_value = request.form['value']
-        p_description = request.form['description']
-        resource_id = resource.id
-        error = None
-
-        if not p_name or not p_value:
-            error = 'No mandatory property is set.'
-
-        if error is not None:
-            flash(error)
-        else:            
-            try:
-                property_d = Property(name=p_name, value=p_value, description=p_description, resource_id=resource_id)
-                db.session.add(property_d)
-                db.session.commit()
-                return redirect(url_for('device.resource_view',id=resource.id))
-
-            except OSError as e:
-                flash("Creation of the directory %s failed" % e)
-            except Exception as e:
-                flash("DB Creation Failed")
-
-    return render_template('device/create_property.html',resource=resource)
-
-
 #Delete Property
 @bp.route('/delete_property/<int:id>', methods=['GET','POST'])
 @login_required
@@ -293,56 +268,6 @@ def delete_property_resource(id):
         flash("Device Not Found")
 
     return render_template('device/delete_property.html',property=property_d)
-
-
-#Resource View
-@bp.route('resource/<int:id>/view', methods=['GET'])
-@login_required
-def resource_view(id):
-    """ Resource View Section"""
-    resource = Resource.query.filter_by(id=id).first()
-    properties = Property.query.filter_by(resource_id=id)
-    return render_template('device/resource_detail.html', resource=resource,properties=properties)
-
-
-#Create Resource
-@bp.route('/add_resource/<int:id>', methods=('GET', 'POST'))
-@login_required
-def create_resource(id):
-    device = Device.query.filter_by(id=id).first()
-    """View for create resources"""
-    if request.method == 'POST':
-
-        r_name = request.form['name']
-        r_type = request.form['type']
-        r_description = request.form['description']
-        device_id = device.id
-        error = None
-
-        if not r_name or not r_type:
-            error = 'No mandatory property is set.'        
-
-        if error is not None:
-            flash(error)
-        else:            
-            try:
-                last_resource = db.session.query(Resource).order_by(Resource.id.desc()).first()
-                if last_resource != None:
-                    last_resource_id = last_resource.id+1
-                else:
-                    last_resource_id = 1
-                resource_d = Resource(name=r_name, description=r_description,global_id = last_resource_id, resource_type=r_type,device_id=device_id)
-                db.session.add(resource_d)
-                db.session.commit()
-                return redirect(url_for('device.device_view',id=device.id))
-
-            except OSError as e:
-                flash("Creation of the directory %s failed" % e)
-            except Exception as e:
-                print(e)
-                flash("DB Creation Failed")
-
-    return render_template('device/create_resource.html',device=device)
 
 
 #Edith Resource
@@ -490,7 +415,7 @@ def add_device_api():
             if not os.path.exists(directory):
                 os.makedirs(directory)
         except OSError as e:
-            flash("Creation of the directory %s failed" % count_dev_str)
+            flash("Creation of the directory failed")
         
         return jsonify(device.serialize)
 
