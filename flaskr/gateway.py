@@ -6,7 +6,7 @@ from requests import patch
 from werkzeug.exceptions import abort
 
 from auth import login_required
-from models import Device, Property, Resource
+from models import Application, Device, Property, Resource
 from persistence import Persistence
 from app import db
 
@@ -47,8 +47,6 @@ def get_self_description(settings):
     this_gateway = {}
     device = Device.query.filter_by(id=1).first()
     return device.get_gateway_serialize
-
-
 
 def disable_standalone():
     #Update internal Settings
@@ -182,3 +180,27 @@ def settings_update():
     else:
         settings = sc.get_config_values()
         return render_template('gateway/update-settings.html',settings=settings)
+
+
+"""------------------------------------------------------------------
+Rest API Methods
+-----------------------------------------------------------------"""
+
+
+#Get representation
+@bp.route('/api/representation/', methods=["GET"])
+def get_self_representation():
+    self_representation = {}
+    device = Device.query.filter_by(id=1).first()
+    self_representation["device"] = device.serialize
+    resources = Resource.query.all()
+    self_representation["resources"] = []
+    for resource in resources:
+        self_representation["resources"].append(resource.serialize)
+    applications = Application.query.all()
+    self_representation["apps"] = []
+    for app in applications:
+        self_representation["apps"].append(app.serialize)
+    
+    
+    return jsonify(self_representation)

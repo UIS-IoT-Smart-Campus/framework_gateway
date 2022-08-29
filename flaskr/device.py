@@ -35,10 +35,7 @@ def delete_resource_method(resource):
 def delete_device_method(device):
     devices = Device.query.filter_by(device_parent=device.id)
     for device_s in devices:
-        delete_device_method(device_s)    
-    resources = Resource.query.filter_by(device_id=device.id)
-    for resource in resources:
-        delete_resource_method(resource)
+        delete_device_method(device_s)
     properties = Property.query.filter_by(device_id=device.id)
     for property in properties:
         db.session.delete(property)

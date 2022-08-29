@@ -42,6 +42,15 @@ class Device(db.Model):
     device_parent = db.Column(db.Integer, db.ForeignKey('device.id'))
 
     @property
+    def light_serialize(self):
+       """Return object data in easily serializable format"""
+       return {
+           'id': self.id,
+           'global_id': self.global_id,
+           'name': self.name
+       }
+
+    @property
     def serialize(self):
        """Return object data in easily serializable format"""
        return {
@@ -51,7 +60,6 @@ class Device(db.Model):
            'description': self.description,
            'device_parent': self.device_parent,
            'is_gateway': self.is_gateway,
-           'applications': self.serializable_apps,
            'properties': self.serializable_properties,
            'resources':self.serializable_resources,
            'devices':self.serializable_devices
@@ -89,7 +97,7 @@ class Device(db.Model):
         """
         Return the resources of the device.
         """
-        return [resource.serializable for resource in self.resources]
+        return [resource.ligth_serializable for resource in self.resources]
     
     @property
     def serializable_devices(self):
@@ -107,11 +115,19 @@ class Application(db.Model):
     devices = db.relationship('Device',secondary=device_app, lazy='subquery',back_populates="applications")
 
     @property
-    def serializable(self):
+    def serialize(self):
         return {
             'global_id': self.global_id,
-            'name': self.name
+            'name': self.name,
+            'devices':self.serializable_devices
         }
+    
+    @property
+    def serializable_devices(self):
+        """
+        Return the devices of the device.
+        """
+        return [device.light_serialize for device in self.devices]
 
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -137,20 +153,27 @@ class Resource(db.Model):
     devices = db.relationship('Device',secondary=device_resource, lazy='subquery',back_populates="resources")
 
     @property
+    def ligth_serializable(self):
+        return {
+            'global_id': self.global_id,
+            'name': self.name,
+            'type': self.resource_type
+        }
+
+    @property
     def serializable(self):
         return {
             'global_id': self.global_id,
             'name': self.name,
             'description': self.description,
             'type': self.resource_type,
-            'create':self.create_at,
             'properties':self.serializable_properties
         }
     
     @property
     def serialize(self):
         return {
-            'id':self.id,
+            'global_id': self.global_id,
             'name': self.name,
             'description': self.description,
             'type': self.resource_type,
