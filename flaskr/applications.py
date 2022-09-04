@@ -35,7 +35,13 @@ def application_view(id):
             if device is not None:
                 application.devices.append(device)
                 db.session.add(application)
-                db.session.commit()    
+                db.session.commit()
+                #-------------SDA CODE--------------------#
+                q = RedisQueue('register')
+                self_device = {"type":"app_device","queue":"create"}
+                self_device["content"] = {"app_id":application.global_id,"device_id":device.global_id}
+                q.put(json.dumps(self_device))
+                #-------------END SDA CODE----------------#   
                 return redirect(url_for('applications.application_view',id = application.id))
     return render_template('applications/detail_app.html', application=application)
 
@@ -66,7 +72,13 @@ def create_application():
                     g_id = 1
                 application = Application(global_id = g_id,name=name, create_at=create_at)
                 db.session.add(application)
-                db.session.commit()               
+                db.session.commit()
+                #-----------SDA CODE--------------------#
+                q = RedisQueue('register')
+                self_device = {"type":"app","queue":"create"}
+                self_device["content"] = application.light_serialize
+                q.put(json.dumps(self_device))
+                #-------------END SDA CODE--------------------#             
                 return redirect(url_for('applications.applications_index'))
            
             except Exception as e:
@@ -91,6 +103,12 @@ def edit_application(id):
                 application.name = name
                 db.session.add(application)
                 db.session.commit()
+                #-----------SDA CODE--------------------#
+                q = RedisQueue('register')
+                self_device = {"type":"app","queue":"update"}
+                self_device["content"] = application.light_serialize
+                q.put(json.dumps(self_device))
+                #-------------END SDA CODE--------------------#  
 
                 return redirect(url_for('applications.application_view',id = application.id))
 
@@ -113,7 +131,13 @@ def delete_application(id):
         if request.method == 'POST':
             try:                
                 db.session.delete(application)
-                db.session.commit()                
+                db.session.commit()
+                #-----------SDA CODE--------------------#
+                q = RedisQueue('register')
+                self_device = {"type":"app","queue":"delete"}
+                self_device["content"] = application.light_serialize
+                q.put(json.dumps(self_device))
+                #-------------END SDA CODE--------------------#             
                 flash("The Application was removed")
                 return redirect(url_for('applications.applications_index'))
 
@@ -237,7 +261,7 @@ def set_app_device(app_id):
         #-------------SDA CODE--------------------#
         q = RedisQueue('register')
         self_device = {"type":"app_device","queue":"create"}
-        self_device["content"] = {"app_id":application.id,"device_id":device.id}
+        self_device["content"] = {"app_id":application.global_id,"device_id":device.global_id}
         q.put(json.dumps(self_device))
         #-------------END SDA CODE----------------#
         return make_response(jsonify({"RESULT":"OK"}),200)
@@ -259,7 +283,7 @@ def delete_app_device(app_id):
         #-------------SDA CODE--------------------#
         q = RedisQueue('register')
         self_device = {"type":"app_device","queue":"delete"}
-        self_device["content"] = {"app_id":application.id,"device_id":device.id}
+        self_device["content"] = {"app_id":application.global_id,"device_id":device.global_id}
         q.put(json.dumps(self_device))
         #-------------END SDA CODE----------------#
         return make_response(jsonify({"RESULT":"OK"}),200)

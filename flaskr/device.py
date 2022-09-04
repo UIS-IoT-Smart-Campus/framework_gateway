@@ -73,6 +73,12 @@ def device_view(id):
                 device.resources.append(resource)
                 db.session.add(device)
                 db.session.commit()
+                #-------------SDA CODE--------------------#
+                q = RedisQueue('register')
+                self_device = {"type":"device_resource","queue":"create"}
+                self_device["content"] = {"device_id":device.global_id,"resource_id":resource.global_id}
+                q.put(json.dumps(self_device))
+                #-------------END SDA CODE----------------#
                 return redirect(url_for('device.device_view',id = device.id))
     else:
         properties = Property.query.filter_by(parent_id=device.id,prop_type="DEVICE")
@@ -411,7 +417,7 @@ def set_device_resource(device_id):
         #-------------SDA CODE--------------------#
         q = RedisQueue('register')
         self_device = {"type":"device_resource","queue":"create"}
-        self_device["content"] = {"device_id":device.id,"resource_id":resource_id}
+        self_device["content"] = {"device_id":device.global_id,"resource_id":resource.global_id}
         q.put(json.dumps(self_device))
         #-------------END SDA CODE----------------#
         return make_response(jsonify({"RESULT":"OK"}),200)
@@ -431,7 +437,7 @@ def delete_device_resource(device_id):
         #-------------SDA CODE--------------------#
         q = RedisQueue('register')
         self_device = {"type":"device_resource","queue":"delete"}
-        self_device["content"] = {"device_id":device.id,"resource_id":resource_id}
+        self_device["content"] = {"device_id":device.global_id,"resource_id":resource.global_id}
         q.put(json.dumps(self_device))
         #-------------END SDA CODE----------------#
         return make_response(jsonify({"RESULT":"OK"}),200)
