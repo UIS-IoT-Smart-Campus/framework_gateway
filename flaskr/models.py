@@ -47,7 +47,12 @@ class Device(db.Model):
        return {
            'id': self.id,
            'global_id': self.global_id,
-           'name': self.name
+           'name': self.name,
+           'description': self.description,
+           'is_gateway':self.is_gateway,
+           'create_at':self.create_at.strftime("%m/%d/%Y"),
+           'update_at':self.update_at.strftime("%m/%d/%Y"),
+           'device_parent':self.device_parent
        }
 
     @property
@@ -89,7 +94,7 @@ class Device(db.Model):
         """
         Return the properties of the device.
         """
-        properties = Property.query.filter_by(device_id=self.id)
+        properties = Property.query.filter_by(prop_type="DEVICE",parent_id=self.id)
         return [properti.serializable for properti in properties]
     
     @property
@@ -113,6 +118,13 @@ class Application(db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     devices = db.relationship('Device',secondary=device_app, lazy='subquery',back_populates="applications")
+
+    @property
+    def light_serialize(self):
+        return {
+            'global_id': self.global_id,
+            'name': self.name
+        }
 
     @property
     def serialize(self):
@@ -153,11 +165,13 @@ class Resource(db.Model):
     devices = db.relationship('Device',secondary=device_resource, lazy='subquery',back_populates="resources")
 
     @property
-    def ligth_serializable(self):
+    def light_serializable(self):
         return {
             'global_id': self.global_id,
             'name': self.name,
-            'type': self.resource_type
+            'description': self.name,
+            'resource_type': self.resource_type,
+            'create_at': self.create_at.strftime("%m/%d/%Y")
         }
 
     @property
@@ -185,24 +199,36 @@ class Resource(db.Model):
         """
         Return the properties of the device.
         """
-        properties = Property.query.filter_by(resource_id=self.id)
+        properties = Property.query.filter_by(prop_type="RESOURCE",parent_id=self.id)
         return [properti.serializable for properti in properties]
 
 
 class Property(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    global_id = db.Column(db.Integer)
     name = db.Column(db.String(80), nullable=False)
     value = db.Column(db.String(80), nullable=False)
-    description = db.Column(db.String(200))
-    device_id = db.Column(db.Integer, db.ForeignKey('device.id'))
-    resource_id = db.Column(db.Integer, db.ForeignKey('resource.id'))
+    prop_type = db.Column(db.String(80), nullable=False)
+    parent_id = db.Column(db.Integer, nullable=False)
+
+    @property
+    def complete_serializable(self):
+        return {
+            'id':self.id,
+            'global_id':self.global_id,
+            'name': self.name,
+            'value': self.value,
+            'prop_type': self.prop_type,
+            'parent_id': self.parent_id
+        }
+
 
     @property
     def serializable(self):
         return {
+            'id':self.id,
             'name': self.name,
             'value': self.value,
-            'description': self.description,
         }
     
     @property
@@ -211,5 +237,4 @@ class Property(db.Model):
             'id':self.id,
             'name': self.name,
             'value': self.value,
-            'description': self.description
         }

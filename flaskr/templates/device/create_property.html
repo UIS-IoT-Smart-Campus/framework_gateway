@@ -77,13 +77,6 @@
       </br>
         <div class="row">
           <div class="col-sm ">
-            <label for="description">Property Description</label>
-            <textarea name="description" id="description" class="form-control">{{ request.form['description'] }}</textarea>
-          </div>
-        </div>
-      </br>
-        <div class="row">
-          <div class="col-sm ">
             <input type="submit" class="btn btn-success" value="Create Property">
             {% if device %}
             <a class="btn btn-danger" href="{{ url_for('device.device_view', id=device['id']) }}" role="button"> Cancel</a>

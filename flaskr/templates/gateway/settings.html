@@ -126,11 +126,36 @@
         </div>
       </div>
     </div>
+    <!-- 4Modal -->
+    <div class="modal fade" id="sdaModal" tabindex="-1" aria-labelledby="sdaModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="settModalLabel">Init SDA Representation</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p><b>Warning:</b> Redis and SDA need to be running.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <form action="{{ url_for('gateway.settings') }}" method="POST">
+              <input type="text" name="sdaInit" value="True" style="display: none;">
+              <input class="btn btn-warning" type="submit" value="INIT">
+            </form>            
+          </div>
+        </div>
+      </div>
+    </div>
+    
     {% if settings['standalone'] %}
     <p>This devices is running in standalone mode, if you want to connect to the backend server, please disable this mode.</p>
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#exampleModal">
       Disable Standalone
+    </button>
+    <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#sdaModal">
+      Init SDA
     </button>
     <table class="table">
       <tbody>
@@ -171,6 +196,11 @@
     <br>
     <table>
       <tr>
+        <td>
+          <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#sdaModal">
+            Init SDA
+          </button>
+        </td>
         <td>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#getModal">
             Get-Representation

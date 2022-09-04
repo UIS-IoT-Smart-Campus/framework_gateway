@@ -20,6 +20,7 @@ import os
 import requests as rq
 import selfconfig as sc
 from datetime import datetime
+from redisTool import RedisQueue
 from datetime import timezone
 
 bp = Blueprint('gateway', __name__, url_prefix='/gateway')
@@ -153,6 +154,22 @@ def settings():
         elif request.form.get('setrepresentation',False):
             settings = sc.get_config_values()
             set_representation(settings)
+            return render_template('gateway/settings.html',settings=settings)
+        elif request.form.get('sdaInit',False):
+            q = RedisQueue('register')
+            self_device = {"type":"device"}
+            self_device["queue"] = "create"
+            this_device = Device.query.filter_by(id=1).first()
+            self_device["content"] = this_device.light_serialize
+            q.put(json.dumps(self_device))
+            properties = Property.query.filter_by(parent_id=1,prop_type="DEVICE")            
+            for proper in properties:
+                prop = {"type":"property"}
+                prop["queue"] = "create"
+                prop["content"] = proper.complete_serializable
+                q.put(json.dumps(prop))
+            flash("SDA Initialized")
+            settings = sc.get_config_values()
             return render_template('gateway/settings.html',settings=settings)
             
     else:

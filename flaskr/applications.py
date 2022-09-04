@@ -6,6 +6,9 @@ from models import Application,Device
 import selfconfig as sc
 from app import db
 from datetime import date
+from flask import jsonify, make_response
+from redisTool import RedisQueue
+import json
 
 bp = Blueprint('applications', __name__, url_prefix='/apps')
 
@@ -39,7 +42,7 @@ def application_view(id):
 
 
 #Create Application
-@bp.route('/create', methods=('GET', 'POST'))
+@bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_application():
     """View for create applications"""
@@ -73,7 +76,7 @@ def create_application():
 
 
 #Edit Application
-@bp.route('/edit/<int:id>', methods=('GET', 'POST'))
+@bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_application(id):
     application = Application.query.filter_by(id=id).first()
@@ -121,3 +124,142 @@ def delete_application(id):
         flash("Application Not Found")
 
     return render_template('applications/delete_app.html',application=application)
+
+"""------------------------------------------------------------------
+API REST Methods
+-----------------------------------------------------------------"""
+
+#########################
+# APPS API REST #####
+########################
+#Get a apps
+@bp.route('/api/', methods=["GET"])
+def get_all():
+    return jsonify(applications=[i.serialize for i in Application.query.all()])
+
+#Get a apps
+@bp.route('/api/<id>', methods=["GET"])
+def get_app_by_id(id):
+    app = Application.query.filter_by(id=id).first()
+    return jsonify(app.serialize)
+
+
+
+#Create a App
+@bp.route('/create/api/', methods=["POST"])
+def create_app():
+    body = request.get_json()
+    if 'name' not in body:
+        error = {"Error":"No mandatory property is set."}
+        return make_response(jsonify(error),400)
+    else:        
+        name = body['name']           
+        global_id = body.get('global_id',None)
+        if not global_id:
+            apps = db.session.query(Application).all()
+            if len(apps)>0:
+                global_id = apps[-1].id+1
+            else:
+                global_id = 1
+        application = Application(name=name,global_id=global_id)
+        db.session.add(application)
+        db.session.commit()
+        #-----------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_device = {"type":"app","queue":"create"}
+        self_device["content"] = application.light_serialize
+        q.put(json.dumps(self_device))
+        #-------------END SDA CODE--------------------#        
+        return jsonify(application.light_serialize)
+
+
+#Update a App
+@bp.route('/update/api/<int:id>/', methods=["PUT"])
+def update_app(id):
+    application = Application.query.filter_by(id=id).first()
+    if not application:
+        error = {"Error":"Application doesn't exist."}
+        return make_response(jsonify(error),400)    
+    else:
+        body = request.get_json()     
+        name = body['name']           
+        global_id = body.get('global_id',None)
+        #Set properties to model
+        if name:
+            application.name = name
+        if global_id:
+            application.global_id = global_id
+        db.session.add(application)
+        db.session.commit()
+        #-----------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_device = {"type":"app","queue":"update"}
+        self_device["content"] = application.light_serialize
+        q.put(json.dumps(self_device))
+        #-------------END SDA CODE--------------------#        
+        return jsonify(application.light_serialize)
+
+
+#Delete a App
+@bp.route('/delete/api/<int:id>/', methods=["DELETE"])
+def delete_app(id):
+    application = Application.query.filter_by(id=id).first()
+    if not application:
+        error = {"Error":"Application doesn't exist."}
+        return make_response(jsonify(error),400)    
+    else:        
+        db.session.delete(application)
+        db.session.commit()
+        #-----------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_device = {"type":"app","queue":"delete"}
+        self_device["content"] = application.light_serialize
+        q.put(json.dumps(self_device))
+        #-------------END SDA CODE--------------------#        
+        return jsonify({"RESULT":"OK"})
+
+
+
+#Add App device
+@bp.route('/device/api/<int:app_id>/', methods=["POST"])
+def set_app_device(app_id):
+    application = Application.query.filter_by(id=app_id).first()
+    if not application:
+        error = {"Error":"Application doesn't exist."}
+        return make_response(jsonify(error),400)
+    body = request.get_json()
+    device_id = body.get('device_id',None)    
+    if device_id is not None:
+        device = Device.query.filter_by(id=device_id).first()
+        application.devices.append(device)
+        db.session.add(application)
+        db.session.commit()
+        #-------------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_device = {"type":"app_device","queue":"create"}
+        self_device["content"] = {"app_id":application.id,"device_id":device.id}
+        q.put(json.dumps(self_device))
+        #-------------END SDA CODE----------------#
+        return make_response(jsonify({"RESULT":"OK"}),200)
+
+#Delete App device
+@bp.route('/device/delete/api/<int:app_id>/', methods=["POST"])
+def delete_app_device(app_id):
+    application = Application.query.filter_by(id=app_id).first()
+    if not application:
+        error = {"Error":"Application doesn't exist."}
+        return make_response(jsonify(error),400)
+    body = request.get_json()
+    device_id = body.get('device_id',None)    
+    if device_id is not None:
+        device = Device.query.filter_by(id=device_id).first()
+        application.devices.remove(device)
+        db.session.add(application)
+        db.session.commit()
+        #-------------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_device = {"type":"app_device","queue":"delete"}
+        self_device["content"] = {"app_id":application.id,"device_id":device.id}
+        q.put(json.dumps(self_device))
+        #-------------END SDA CODE----------------#
+        return make_response(jsonify({"RESULT":"OK"}),200)
