@@ -168,6 +168,15 @@ def settings():
                 prop["queue"] = "create"
                 prop["content"] = proper.complete_serializable
                 q.put(json.dumps(prop))
+            for resource in this_device.resources:
+                prop = {"type":"resource"}
+                prop["queue"] = "create"
+                prop["content"] = resource.light_serializable
+                q.put(json.dumps(prop))
+                #--------------RELATION-----------#
+                relation_dev_res = {"type":"device_resource","queue":"create"}
+                relation_dev_res["content"] = {"device_id":this_device.global_id,"resource_id":resource.global_id}
+                q.put(json.dumps(relation_dev_res))
             flash("SDA Initialized")
             settings = sc.get_config_values()
             return render_template('gateway/settings.html',settings=settings)

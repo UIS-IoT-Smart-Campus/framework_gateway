@@ -169,7 +169,7 @@ class Resource(db.Model):
         return {
             'global_id': self.global_id,
             'name': self.name,
-            'description': self.name,
+            'description': self.description,
             'resource_type': self.resource_type,
             'create_at': self.create_at.strftime("%m/%d/%Y")
         }

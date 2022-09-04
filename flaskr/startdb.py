@@ -1,5 +1,5 @@
 from app import db
-from models import Device,User,Property
+from models import Device,User,Resource,Property
 from datetime import date
 import selfconfig as sc
 
@@ -53,3 +53,17 @@ for key in nostandalone_settings_properties:
         property_d = Property(name=key,value=settings[key],prop_type="DEVICE",parent_id=device.id,global_id=prop_count)
         db.session.add(property_d)
         db.session.commit()
+
+#CREATE RESOURCES
+database = Resource(name="DB",description="SQlite Database",resource_type="STORAGE",global_id=1)
+db.session.add(database)
+db.session.commit()
+
+broker = Resource(name="BROKER",description="MQTT Internal Broker ",resource_type="COMMUNICATION",global_id=2)
+db.session.add(broker)
+db.session.commit()
+
+device.resources.append(database)
+device.resources.append(broker)
+db.session.add(device)
+db.session.commit()
