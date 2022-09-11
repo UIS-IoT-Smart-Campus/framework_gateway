@@ -333,7 +333,7 @@ def update_resource_api(id):
         self_resource["content"] = resource.light_serializable
         q.put(json.dumps(self_resource))
         #-------------END SDA CODE--------------------#
-        return make_response(jsonify(resource.serializable),200)
+        return make_response(jsonify(resource.serialize),200)
 
     else:
         error = {"Error":"The device doesn't exist."}

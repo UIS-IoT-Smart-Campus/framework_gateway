@@ -122,6 +122,7 @@ class Application(db.Model):
     @property
     def light_serialize(self):
         return {
+            'id':self.id,
             'global_id': self.global_id,
             'name': self.name
         }
@@ -187,6 +188,7 @@ class Resource(db.Model):
     @property
     def serialize(self):
         return {
+            'id':self.id,
             'global_id': self.global_id,
             'name': self.name,
             'description': self.description,
