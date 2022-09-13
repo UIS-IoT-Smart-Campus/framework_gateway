@@ -352,6 +352,18 @@ def delete_resource_api(id):
         error = {"Error":"It's not possible to delete the device"}
         return make_response(jsonify(error),400)
 
+#Delete Resource
+@bp.route('/api/global/<global_id>/', methods=["DELETE"])
+def delete_global_resource_api(global_id):
+    resource = Resource.query.filter_by(global_id=global_id).first()
+    try:
+        delete_resource_method(resource)
+        return make_response(jsonify({"Delete":"The resource was remove"}),200)
+
+    except Exception as e:
+        error = {"Error":"It's not possible to delete the device"}
+        return make_response(jsonify(error),400)
+
 """----------------------------------------------------------------------------------------------
 #########################
 # REMOTE ADMIN PROPERTIES API REST #####

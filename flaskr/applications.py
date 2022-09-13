@@ -242,7 +242,23 @@ def delete_app(id):
         #-------------END SDA CODE--------------------#        
         return jsonify({"RESULT":"OK"})
 
-
+#Delete a App
+@bp.route('/delete/api/global/<int:app_global_id>/', methods=["DELETE"])
+def delete_global_app(app_global_id):
+    application = Application.query.filter_by(global_id=app_global_id).first()
+    if not application:
+        error = {"Error":"Application doesn't exist."}
+        return make_response(jsonify(error),400)    
+    else:        
+        db.session.delete(application)
+        db.session.commit()
+        #-----------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_device = {"type":"app","queue":"delete"}
+        self_device["content"] = application.light_serialize
+        q.put(json.dumps(self_device))
+        #-------------END SDA CODE--------------------#        
+        return jsonify({"RESULT":"OK"})
 
 #Add App device
 @bp.route('/device/api/<int:app_id>/', methods=["POST"])
@@ -266,10 +282,54 @@ def set_app_device(app_id):
         #-------------END SDA CODE----------------#
         return make_response(jsonify({"RESULT":"OK"}),200)
 
+#Add App device
+@bp.route('/device/api/global/<int:app_global_id>/', methods=["POST"])
+def set_app_global_device(app_global_id):
+    application = Application.query.filter_by(global_id=app_global_id).first()
+    if not application:
+        error = {"Error":"Application doesn't exist."}
+        return make_response(jsonify(error),400)
+    body = request.get_json()
+    device_id = body.get('device_id',None)    
+    if device_id is not None:
+        device = Device.query.filter_by(id=device_id).first()
+        application.devices.append(device)
+        db.session.add(application)
+        db.session.commit()
+        #-------------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_device = {"type":"app_device","queue":"create"}
+        self_device["content"] = {"app_id":application.global_id,"device_id":device.global_id}
+        q.put(json.dumps(self_device))
+        #-------------END SDA CODE----------------#
+        return make_response(jsonify({"RESULT":"OK"}),200)
+
 #Delete App device
 @bp.route('/device/delete/api/<int:app_id>/', methods=["POST"])
 def delete_app_device(app_id):
     application = Application.query.filter_by(id=app_id).first()
+    if not application:
+        error = {"Error":"Application doesn't exist."}
+        return make_response(jsonify(error),400)
+    body = request.get_json()
+    device_id = body.get('device_id',None)    
+    if device_id is not None:
+        device = Device.query.filter_by(id=device_id).first()
+        application.devices.remove(device)
+        db.session.add(application)
+        db.session.commit()
+        #-------------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_device = {"type":"app_device","queue":"delete"}
+        self_device["content"] = {"app_id":application.global_id,"device_id":device.global_id}
+        q.put(json.dumps(self_device))
+        #-------------END SDA CODE----------------#
+        return make_response(jsonify({"RESULT":"OK"}),200)
+
+#Delete App device
+@bp.route('/device/delete/api/global/<int:global_app_id>/', methods=["POST"])
+def delete_app_global_device(global_app_id):
+    application = Application.query.filter_by(global_id=global_app_id).first()
     if not application:
         error = {"Error":"Application doesn't exist."}
         return make_response(jsonify(error),400)
