@@ -47,7 +47,7 @@ def delete_info():
 def get_self_description(settings):
     this_gateway = {}
     device = Device.query.filter_by(id=1).first()
-    return device.get_gateway_serialize
+    return device.light_serialize
 
 def disable_standalone():
     #Update internal Settings
@@ -110,6 +110,33 @@ def set_representation(settings):
     backend_url = settings["backendurl"]
     backend_port = settings["backendport"]
     api_url = "http://"+backend_url+":"+str(backend_port)+"/device"
+    this_gateway = Device.query.filter_by(id=1).first()
+    response = rq.post(api_url,json=this_gateway.light_serialize).json()
+    #Actualizar ID Globales.
+    this_gateway.global_id = response["global_id"]
+    settings["global_id"] = response["global_id"]
+    sc.set_config_values(settings)
+    db.session.add(this_gateway)
+    db.session.commit()
+    for resource in this_gateway.resources:
+        api_url = "http://"+backend_url+":"+str(backend_port)+"/resource"
+        response = rq.post(api_url,json=resource.light_serializable).json()
+        resource.global_id = response["global_id"]
+        db.session.add(resource)
+        db.session.commit()
+        api_url_2 = "http://"+backend_url+":"+str(backend_port)+"/device/resource/"+str(this_gateway.global_id)
+        body = {"resource_id":resource.global_id}
+        rq.post(api_url_2,json=body)
+    properties = Property.query.filter_by(prop_type="DEVICE",parent_id=this_gateway.id)
+    for prop in properties:
+        api_url = "http://"+backend_url+":"+str(backend_port)+"/device/property/"+str(this_gateway.global_id)
+        response = rq.post(api_url,json=prop.serializable).json()
+        prop.global_id = response["global_id"]        
+        db.session.add(prop)
+        db.session.commit()
+
+
+    """
     this_gateway_obj = get_self_description(settings)
     response = json.loads(rq.post(api_url,json=this_gateway_obj).text)
     #Actualizar configuración interna
@@ -129,6 +156,7 @@ def set_representation(settings):
                 prop.global_id = b_prop['id']
                 db.session.add(prop)
                 db.session.commit()
+    """
         
 
 

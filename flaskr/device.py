@@ -46,7 +46,6 @@ def delete_device_method(device):
     self_device["content"] = device.light_serialize
     q.put(json.dumps(self_device))
     #-------------END SDA CODE--------------------#
-    print(device.light_serialize)
     if os.path.isdir(dirc):
         shutil.rmtree(dirc)
 
@@ -403,6 +402,7 @@ def delete_device_api(id):
         error = {"Error":"It's not possible to delete the device"}
         return make_response(jsonify(error),400)
 
+
 #Add Resource device
 @bp.route('/resource/api/<device_id>/', methods=["POST"])
 def set_device_resource(device_id):
@@ -422,6 +422,26 @@ def set_device_resource(device_id):
         #-------------END SDA CODE----------------#
         return make_response(jsonify({"RESULT":"OK"}),200)
 
+#Add Resource device
+@bp.route('/resource/api/global/<global_device_id>/', methods=["POST"])
+def set_global_device_resource(global_device_id):
+    device = Device.query.filter_by(global_id=global_device_id).first()
+    body = request.get_json()
+    resource_id = body.get('resource_id',None)
+    resource = Resource.query.filter_by(global_id=resource_id).first()
+    if resource is not None:
+        device.resources.append(resource)
+        db.session.add(device)
+        db.session.commit()
+        #-------------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_device = {"type":"device_resource","queue":"create"}
+        self_device["content"] = {"device_id":device.global_id,"resource_id":resource.global_id}
+        q.put(json.dumps(self_device))
+        #-------------END SDA CODE----------------#
+        return make_response(jsonify({"RESULT":"OK"}),200)
+
+
 
 #Remove Resource device
 @bp.route('/resource/api/delete/<int:device_id>/', methods=["POST"])
@@ -430,6 +450,25 @@ def delete_device_resource(device_id):
     body = request.get_json()
     resource_id = body.get('resource_id',None)
     resource = Resource.query.filter_by(id=resource_id).first()
+    if resource is not None:
+        device.resources.remove(resource)
+        db.session.add(device)
+        db.session.commit()
+        #-------------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_device = {"type":"device_resource","queue":"delete"}
+        self_device["content"] = {"device_id":device.global_id,"resource_id":resource.global_id}
+        q.put(json.dumps(self_device))
+        #-------------END SDA CODE----------------#
+        return make_response(jsonify({"RESULT":"OK"}),200)
+
+#Remove Resource device
+@bp.route('/resource/api/global/delete/<int:global_id>/', methods=["POST"])
+def delete_global_device_resource(global_id):
+    device = Device.query.filter_by(global_id=global_id).first()
+    body = request.get_json()
+    resource_id = body.get('resource_id',None)
+    resource = Resource.query.filter_by(global_id=resource_id).first()
     if resource is not None:
         device.resources.remove(resource)
         db.session.add(device)
@@ -500,6 +539,43 @@ def create_device_property(device_id):
     #-------------END SDA CODE----------------#
     return make_response(jsonify(property_d.complete_serializable),200)
 
+#Create Device Property
+@bp.route('/property/global/api/<int:global_device_id>/', methods=["POST"])
+def create_global_device_property(global_device_id):
+
+    device = Device.query.filter_by(global_id=global_device_id).first()
+    if not device:
+        error = {"Error":"No device exist."}
+        return make_response(jsonify(error),400)
+      
+    body = request.get_json()
+
+    #Get data from request
+    name = body.get('name',None)
+    value = body.get('value',None)
+    global_id = body.get('global_id',None)
+    if not global_id:
+        properties = db.session.query(Property).all()
+        if len(properties)>0:
+            global_id = properties[-1].id+1
+        else:
+            global_id = 1
+ 
+    if not name or not value:
+        error = {"Error":"No mandatory property is set."}
+        return make_response(jsonify(error),400)
+    
+    property_d = Property(name=name, value=value, prop_type="DEVICE",parent_id=device.id,global_id=global_id)
+    db.session.add(property_d)
+    db.session.commit()
+    #-------------SDA CODE--------------------#
+    q = RedisQueue('register')
+    self_prop = {"type":"property","queue":"create"}
+    self_prop["content"] = property_d.complete_serializable
+    q.put(json.dumps(self_prop))
+    #-------------END SDA CODE----------------#
+    return make_response(jsonify(property_d.complete_serializable),200)
+
 #Delete Device Property
 @bp.route('/property/delete/api/<int:property_id>/', methods=["POST"])
 def delete_device_property(property_id):
@@ -511,6 +587,30 @@ def delete_device_property(property_id):
       
     body = request.get_json()
 
+    try:
+        #Delete the database register
+        db.session.delete(property_d)
+        db.session.commit()
+        #-------------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_prop = {"type":"property","queue":"delete"}
+        self_prop["content"] = property_d.complete_serializable
+        q.put(json.dumps(self_prop))
+        #-------------END SDA CODE----------------#
+        return make_response(jsonify({"RESULT":"OK"}),200)               
+
+    except Exception as e:
+        error = {"Error":"Internal Error"}
+        return make_response(jsonify(error),500)
+
+#Delete Device Property
+@bp.route('/property/delete/api/global/<int:global_id>/', methods=["DELETE"])
+def delete_global_device_property(global_id):
+
+    property_d = Property.query.filter_by(global_id=global_id).first()
+    if not property_d:
+        error = {"Error":"No property exist."}
+        return make_response(jsonify(error),400)      
     try:
         #Delete the database register
         db.session.delete(property_d)
