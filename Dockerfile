@@ -1,4 +1,4 @@
-FROM python:3.7.12-slim-buster
+FROM arm32v7/python:3.7.10-buster
 
 WORKDIR /usr/src/app
 
