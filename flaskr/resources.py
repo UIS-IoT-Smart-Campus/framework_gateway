@@ -11,7 +11,7 @@ from redisTool import RedisQueue
 import json
 from flask import jsonify,make_response
 
-bp = Blueprint('resource', __name__, url_prefix='/resources')
+bp = Blueprint('resource', __name__, url_prefix='/resource')
 
 
 #Delete Resource
@@ -408,16 +408,78 @@ def create_resource_property(resource_id):
     return make_response(jsonify(property_d.complete_serializable),200)
 
 
-#Delete Device Property
-@bp.route('/property/delete/api/<int:property_id>/', methods=["POST"])
-def delete_device_property(property_id):
+#Create Resource Property
+@bp.route('/property/create/global/api/<int:global_id>/', methods=["POST"])
+def create_global_resource_property(global_id):
 
-    property_d = Property.query.filter_by(id=property_id).first()
+    resource = Resource.query.filter_by(global_id=global_id).first()
+    if not resource:
+        error = {"Error":"No resource exist."}
+        return make_response(jsonify(error),400) 
+    body = request.get_json()
+
+    #Get data from request
+    name = body.get('name',None)
+    value = body.get('value',None)
+    global_id = body.get('global_id',None)
+    if not global_id:
+        properties = db.session.query(Property).all()
+        if len(properties)>0:
+            global_id = properties[-1].id+1
+        else:
+            global_id = 1
+ 
+    if not name or not value:
+        error = {"Error":"No mandatory property is set."}
+        return make_response(jsonify(error),400)
+    
+    property_d = Property(name=name, value=value, prop_type="RESOURCE",parent_id=resource.id,global_id=global_id)
+    db.session.add(property_d)
+    db.session.commit()
+    #-------------SDA CODE--------------------#
+    q = RedisQueue('register')
+    self_prop = {"type":"property","queue":"create"}
+    self_prop["content"] = property_d.complete_serializable
+    q.put(json.dumps(self_prop))
+    #-------------END SDA CODE----------------#
+    return make_response(jsonify(property_d.complete_serializable),200)
+
+
+#Delete Resource Property
+@bp.route('/property/delete/api/<int:property_id>/', methods=["POST"])
+def delete_resource_property(property_id):
+
+    property_d = Property.query.filter_by(id=property_id,prop_type="RESOURCE").first()
     if not property_d:
         error = {"Error":"No property exist."}
         return make_response(jsonify(error),400)
       
     body = request.get_json()
+
+    try:
+        #Delete the database register
+        db.session.delete(property_d)
+        db.session.commit()
+        #-------------SDA CODE--------------------#
+        q = RedisQueue('register')
+        self_prop = {"type":"property","queue":"delete"}
+        self_prop["content"] = property_d.complete_serializable
+        q.put(json.dumps(self_prop))
+        #-------------END SDA CODE----------------#
+        return make_response(jsonify({"RESULT":"OK"}),200)               
+
+    except Exception as e:
+        error = {"Error":"Internal Error"}
+        return make_response(jsonify(error),500)
+
+
+#Delete global Resource Property
+@bp.route('/property/global/api/<int:global_id>/', methods=["DELETE"])
+def delete_global_resource_property(global_id):
+    property_d = Property.query.filter_by(global_id=global_id,prop_type="RESOURCE").first()
+    if not property_d:
+        error = {"Error":"No property exist."}
+        return make_response(jsonify(error),400)      
 
     try:
         #Delete the database register

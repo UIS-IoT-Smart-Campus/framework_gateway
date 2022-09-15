@@ -124,6 +124,9 @@ def set_representation(settings):
         resource.global_id = response["global_id"]
         db.session.add(resource)
         db.session.commit()
+        api_url_2 = "http://"+backend_url+":"+str(backend_port)+"/device/resource/"+str(this_gateway.global_id)
+        body = {"resource_id":resource.global_id}
+        rq.post(api_url_2,json=body)
     properties = Property.query.filter_by(prop_type="DEVICE",parent_id=this_gateway.id)
     for prop in properties:
         api_url = "http://"+backend_url+":"+str(backend_port)+"/device/property/"+str(this_gateway.global_id)

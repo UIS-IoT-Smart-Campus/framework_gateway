@@ -428,7 +428,7 @@ def set_global_device_resource(global_device_id):
     device = Device.query.filter_by(global_id=global_device_id).first()
     body = request.get_json()
     resource_id = body.get('resource_id',None)
-    resource = Resource.query.filter_by(id=resource_id).first()
+    resource = Resource.query.filter_by(global_id=resource_id).first()
     if resource is not None:
         device.resources.append(resource)
         db.session.add(device)
@@ -463,12 +463,12 @@ def delete_device_resource(device_id):
         return make_response(jsonify({"RESULT":"OK"}),200)
 
 #Remove Resource device
-@bp.route('/resource/api/global/delete/<int:device_id>/', methods=["POST"])
-def delete_global_device_resource(device_id):
-    device = Device.query.filter_by(id=device_id).first()
+@bp.route('/resource/api/global/delete/<int:global_id>/', methods=["POST"])
+def delete_global_device_resource(global_id):
+    device = Device.query.filter_by(global_id=global_id).first()
     body = request.get_json()
     resource_id = body.get('resource_id',None)
-    resource = Resource.query.filter_by(id=resource_id).first()
+    resource = Resource.query.filter_by(global_id=resource_id).first()
     if resource is not None:
         device.resources.remove(resource)
         db.session.add(device)
