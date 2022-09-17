@@ -232,6 +232,10 @@ def settings_update():
         settings['gateway_ipv4'] = request.form.get('gateway_ipv4','localhost')        
         settings = sc.set_config_values(settings)
         print(settings['gateway_ipv4'])
+        this_device = Device.query.filter_by(id=1).first()
+        this_device.name = settings['mqttclient']
+        db.session.add(this_device)
+        db.session.commit()
         properties = Property.query.filter_by(prop_type="DEVICE",parent_id=1)
         for prop in properties:
             if prop.name == "gateway_ipv4":
