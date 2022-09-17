@@ -292,7 +292,7 @@ def set_app_global_device(app_global_id):
     body = request.get_json()
     device_id = body.get('device_id',None)    
     if device_id is not None:
-        device = Device.query.filter_by(id=device_id).first()
+        device = Device.query.filter_by(global_id=device_id).first()
         application.devices.append(device)
         db.session.add(application)
         db.session.commit()
