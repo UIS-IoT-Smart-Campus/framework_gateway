@@ -16,10 +16,6 @@ Flask==1.1.2
 Flask-Migrate==3.0.0
 Flask-MQTT==1.1.1
 Flask-SQLAlchemy==2.5.1
-<<<<<<< HEAD
-=======
-greenlet==1.0.0
->>>>>>> 4a5b197ab9f251f062bf43c09095591226123fe0
 gunicorn==20.1.0
 html5lib==1.0.1
 idna==2.8
