@@ -229,7 +229,17 @@ def settings_update():
         settings['brokerbackendtopic'] = request.form.get('brokerbackendtopic','devices/messages/')
         settings['mqttclient'] = request.form.get('mqttclient','GT001')
         settings['backendgatewayid'] = request.form.get('backendgatewayid','0')
+        settings['gateway_ipv4'] = request.form.get('gateway_ipv4','localhost')        
         settings = sc.set_config_values(settings)
+        print(settings['gateway_ipv4'])
+        properties = Property.query.filter_by(prop_type="DEVICE",parent_id=1)
+        for prop in properties:
+            if prop.name == "gateway_ipv4":
+                prop.value = settings['gateway_ipv4']
+                db.session.add(prop)
+                db.session.commit()
+
+
         return redirect(url_for('gateway.settings'))
     else:
         settings = sc.get_config_values()
