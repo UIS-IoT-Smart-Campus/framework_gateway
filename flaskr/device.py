@@ -319,7 +319,7 @@ def add_device_api():
             error = {"Error":"The device with this name is already exist."}
             return make_response(jsonify(error),400)
         if device_parent is not None:
-            device = Device.query.filter_by(id=device_parent)
+            device = Device.query.filter_by(global_id=device_parent)
             if device is None:
                 error = {"Error":"The parent device ID not exist."}
                 return make_response(jsonify(error),400)
@@ -347,9 +347,9 @@ def add_device_api():
         return jsonify(device.serialize)
 
 #Update device
-@bp.route('/update/api/<int:id>/', methods=["PUT"])
-def update_device_api(id):
-    device = Device.query.filter_by(id=id).first()
+@bp.route('/update/api/<int:global_id>/', methods=["PUT"])
+def update_device_api(global_id):
+    device = Device.query.filter_by(global_id=global_id).first()
     
     if device is not None:
         body = request.get_json()
@@ -390,9 +390,9 @@ def update_device_api(id):
 
     
 #Delete device
-@bp.route('/delete/api/<int:id>/', methods=["DELETE"])
-def delete_device_api(id):
-    device = Device.query.filter_by(id=id).first()
+@bp.route('/delete/api/<int:global_id>/', methods=["DELETE"])
+def delete_device_api(global_id):
+    device = Device.query.filter_by(global_id=global_id).first()
     try:
         delete_device_method(device)
         return make_response(jsonify({"Delete":"The device was remove"}),200)
