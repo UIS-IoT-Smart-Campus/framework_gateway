@@ -334,9 +334,10 @@ def delete_app_global_device(global_app_id):
         error = {"Error":"Application doesn't exist."}
         return make_response(jsonify(error),400)
     body = request.get_json()
-    device_id = body.get('device_id',None)    
+    device_id = body.get('device_id',None)
+    print(device_id)    
     if device_id is not None:
-        device = Device.query.filter_by(id=device_id).first()
+        device = Device.query.filter_by(global_id=device_id).first()
         application.devices.remove(device)
         db.session.add(application)
         db.session.commit()
