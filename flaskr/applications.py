@@ -341,10 +341,12 @@ def delete_app_global_device(global_app_id):
         application.devices.remove(device)
         db.session.add(application)
         db.session.commit()
-        #-------------SDA CODE--------------------#
-        q = RedisQueue('register')
-        self_device = {"type":"app_device","queue":"delete"}
-        self_device["content"] = {"app_id":application.global_id,"device_id":device.global_id}
-        q.put(json.dumps(self_device))
-        #-------------END SDA CODE----------------#
+        settings = sc.get_config_values()
+        if settings['standalone']:            
+            #-------------SDA CODE--------------------#
+            q = RedisQueue('register')
+            self_device = {"type":"app_device","queue":"delete"}
+            self_device["content"] = {"app_id":application.global_id,"device_id":device.global_id}
+            q.put(json.dumps(self_device))
+            #-------------END SDA CODE----------------#
         return make_response(jsonify({"RESULT":"OK"}),200)
