@@ -344,7 +344,7 @@ def add_device_api():
         except OSError as e:
             flash("Creation of the directory failed")
         
-        return jsonify(device.serialize)
+        return jsonify(device.light_serialize)
 
 #Update device
 @bp.route('/update/api/<int:global_id>/', methods=["PUT"])
