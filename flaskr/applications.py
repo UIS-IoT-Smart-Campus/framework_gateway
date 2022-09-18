@@ -252,12 +252,14 @@ def delete_global_app(app_global_id):
     else:        
         db.session.delete(application)
         db.session.commit()
-        #-----------SDA CODE--------------------#
-        q = RedisQueue('register')
-        self_device = {"type":"app","queue":"delete"}
-        self_device["content"] = application.light_serialize
-        q.put(json.dumps(self_device))
-        #-------------END SDA CODE--------------------#        
+        settings = sc.get_config_values()
+        if settings['standalone']:   
+            #-----------SDA CODE--------------------#
+            q = RedisQueue('register')
+            self_device = {"type":"app","queue":"delete"}
+            self_device["content"] = application.light_serialize
+            q.put(json.dumps(self_device))
+            #-------------END SDA CODE--------------------#        
         return jsonify({"RESULT":"OK"})
 
 #Add App device
