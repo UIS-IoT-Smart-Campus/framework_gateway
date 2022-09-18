@@ -56,6 +56,7 @@ class Device(db.Model):
        }
     @property
     def light_serialize_sda(self):
+       device_parent = Device.query.filter_by(global_id=self.device_parent).first()
        """Return object data in easily serializable format"""
        return {
            'id': self.id,
@@ -65,7 +66,7 @@ class Device(db.Model):
            'is_gateway':self.is_gateway,
            'create_at':self.create_at.strftime("%m/%d/%Y"),
            'update_at':self.update_at.strftime("%m/%d/%Y"),
-           'device_parent':self.device_parent.global_id
+           'device_parent':device_parent.global_id
        }
 
     @property
