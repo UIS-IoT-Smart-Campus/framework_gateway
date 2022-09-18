@@ -319,14 +319,14 @@ def add_device_api():
             error = {"Error":"The device with this name is already exist."}
             return make_response(jsonify(error),400)
         if device_parent is not None:
-            device_p = Device.query.filter_by(global_id=device_parent)
+            device_p = Device.query.filter_by(global_id=device_parent).first()
             if device_p is None:
                 error = {"Error":"The parent device ID not exist."}
                 return make_response(jsonify(error),400)
             else:
                 device_parent = device_p.id
         else:
-            device_parent=1        
+            device_parent=1
 
         device = Device(name=name,description=description,global_id=global_id,is_gateway=is_gateway,device_parent=device_parent,create_at=create_at,update_at=update_at)
         db.session.add(device)
