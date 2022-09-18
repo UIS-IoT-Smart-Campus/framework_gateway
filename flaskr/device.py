@@ -334,7 +334,7 @@ def add_device_api():
         #-----------SDA CODE--------------------#
         q = RedisQueue('register')
         self_device = {"type":"device","queue":"create"}
-        self_device["content"] = device.light_serialize
+        self_device["content"] = device.light_serialize_sda
         q.put(json.dumps(self_device))
         #-------------END SDA CODE--------------------#
 

@@ -54,6 +54,19 @@ class Device(db.Model):
            'update_at':self.update_at.strftime("%m/%d/%Y"),
            'device_parent':self.device_parent
        }
+    @property
+    def light_serialize_sda(self):
+       """Return object data in easily serializable format"""
+       return {
+           'id': self.id,
+           'global_id': self.global_id,
+           'name': self.name,
+           'description': self.description,
+           'is_gateway':self.is_gateway,
+           'create_at':self.create_at.strftime("%m/%d/%Y"),
+           'update_at':self.update_at.strftime("%m/%d/%Y"),
+           'device_parent':self.device_parent.global_id
+       }
 
     @property
     def serialize(self):
